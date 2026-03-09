@@ -45,11 +45,11 @@ text-shadow:0 0 15px #ff4040;
 }
 
 .flashCorrect{
-animation:flashGreen 0.25s;
+animation:flashGreen 0.3s;
 }
 
 .flashWrong{
-animation:flashRed 0.25s;
+animation:flashRed 0.3s;
 }
 
 @keyframes flashGreen{
@@ -103,39 +103,51 @@ font-size:24px;
 
 <script>
 
-/* ===============================
-AUDIO ENGINE
-=============================== */
+/* =====================
+UNLOCK AUDIO
+===================== */
 
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioUnlocked=false;
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
+document.body.addEventListener("click",()=>{
+if(!audioUnlocked){
+audioCtx.resume();
+audioUnlocked=true;
+}
+});
+
+/* =====================
+SOUNDS
+===================== */
 
 function playCorrect(){
 
-let osc = audioCtx.createOscillator();
-let gain = audioCtx.createGain();
+let osc=audioCtx.createOscillator();
+let gain=audioCtx.createGain();
 
 osc.type="triangle";
-osc.frequency.value=750;
+osc.frequency.value=850;
 
-gain.gain.value=0.15;
+gain.gain.value=0.18;
 
 osc.connect(gain);
 gain.connect(audioCtx.destination);
 
 osc.start();
-osc.stop(audioCtx.currentTime+0.18);
+osc.stop(audioCtx.currentTime+0.15);
 
 }
 
 function playWrong(){
 
-let osc = audioCtx.createOscillator();
-let gain = audioCtx.createGain();
+let osc=audioCtx.createOscillator();
+let gain=audioCtx.createGain();
 
 osc.type="sawtooth";
-osc.frequency.value=130;
+osc.frequency.value=120;
 
-gain.gain.value=0.18;
+gain.gain.value=0.2;
 
 osc.connect(gain);
 gain.connect(audioCtx.destination);
@@ -145,11 +157,11 @@ osc.stop(audioCtx.currentTime+0.25);
 
 }
 
-/* ===============================
-100 WORD COMBAT POOL
-=============================== */
+/* =====================
+WORD POOL
+===================== */
 
-const words = [
+const words=[
 
 {word:"ship",phonemes:["ʃ","ɪ","p"]},
 {word:"sheep",phonemes:["ʃ","iː","p"]},
@@ -167,7 +179,6 @@ const words = [
 {word:"beach",phonemes:["b","iː","tʃ"]},
 {word:"cheap",phonemes:["tʃ","iː","p"]},
 {word:"sheet",phonemes:["ʃ","iː","t"]},
-{word:"sheesh",phonemes:["ʃ","iː","ʃ"]},
 {word:"cheese",phonemes:["tʃ","iː","z"]},
 {word:"peach",phonemes:["p","iː","tʃ"]},
 
@@ -178,66 +189,27 @@ const words = [
 {word:"rough",phonemes:["r","ʌ","f"]},
 {word:"cough",phonemes:["k","ɒ","f"]},
 {word:"enough",phonemes:["ɪ","n","ʌ","f"]},
-{word:"thorough",phonemes:["θ","ʌ","r","oʊ"]},
 
 {word:"people",phonemes:["p","iː","p","l"]},
 {word:"business",phonemes:["b","ɪ","z","n","ɪ","s"]},
 {word:"different",phonemes:["d","ɪ","f","r","ə","n","t"]},
-{word:"probably",phonemes:["p","r","ɑ","b","ə","b","l","i"]},
 {word:"interesting",phonemes:["ɪ","n","t","r","ə","s","t","ɪ","ŋ"]},
-{word:"comfortable",phonemes:["k","ʌ","m","f","t","ə","b","l"]},
-{word:"vegetable",phonemes:["v","ɛ","dʒ","t","ə","b","l"]},
-{word:"chocolate",phonemes:["tʃ","ɔ","k","l","ə","t"]},
 
 {word:"choir",phonemes:["k","w","aɪ","r"]},
 {word:"chaos",phonemes:["k","eɪ","ɒ","s"]},
 {word:"sword",phonemes:["s","ɔː","r","d"]},
-{word:"answer",phonemes:["æ","n","s","ə","r"]},
 {word:"island",phonemes:["aɪ","l","ə","n","d"]},
-{word:"mischievous",phonemes:["m","ɪ","s","tʃ","ə","v","ə","s"]},
 
 {word:"sleepy",phonemes:["s","l","iː","p","i"]},
 {word:"sneaky",phonemes:["s","n","iː","k","i"]},
 {word:"sheepdog",phonemes:["ʃ","iː","p","d","ɒ","g"]},
-{word:"spaceship",phonemes:["s","p","eɪ","s","ʃ","ɪ","p"]},
-
-/* filler to reach ~100 */
-{word:"sip",phonemes:["s","ɪ","p"]},
-{word:"seep",phonemes:["s","iː","p"]},
-{word:"pick",phonemes:["p","ɪ","k"]},
-{word:"peak",phonemes:["p","iː","k"]},
-{word:"lick",phonemes:["l","ɪ","k"]},
-{word:"leak",phonemes:["l","iː","k"]},
-{word:"kick",phonemes:["k","ɪ","k"]},
-{word:"keek",phonemes:["k","iː","k"]},
-
-{word:"shipyard",phonemes:["ʃ","ɪ","p","j","ɑ","r","d"]},
-{word:"seaside",phonemes:["s","iː","s","aɪ","d"]},
-{word:"season",phonemes:["s","iː","z","ə","n"]},
-{word:"simple",phonemes:["s","ɪ","m","p","l"]},
-{word:"signal",phonemes:["s","ɪ","g","n","l"]},
-{word:"silver",phonemes:["s","ɪ","l","v","ə","r"]},
-{word:"sister",phonemes:["s","ɪ","s","t","ə","r"]},
-{word:"system",phonemes:["s","ɪ","s","t","ə","m"]},
-
-{word:"teacher",phonemes:["t","iː","tʃ","ə","r"]},
-{word:"reader",phonemes:["r","iː","d","ə","r"]},
-{word:"speaker",phonemes:["s","p","iː","k","ə","r"]},
-{word:"writer",phonemes:["r","aɪ","t","ə","r"]},
-{word:"leader",phonemes:["l","iː","d","ə","r"]},
-{word:"player",phonemes:["p","l","eɪ","ə","r"]},
-
-{word:"future",phonemes:["f","j","uː","tʃ","ə","r"]},
-{word:"feature",phonemes:["f","iː","tʃ","ə","r"]},
-{word:"nature",phonemes:["n","eɪ","tʃ","ə","r"]},
-{word:"picture",phonemes:["p","ɪ","k","tʃ","ə","r"]},
-{word:"culture",phonemes:["k","ʌ","l","tʃ","ə","r"]},
+{word:"spaceship",phonemes:["s","p","eɪ","s","ʃ","ɪ","p"]}
 
 ];
 
-/* ===============================
+/* =====================
 SHUFFLE BAG
-=============================== */
+===================== */
 
 let bag=[];
 let current;
@@ -255,13 +227,13 @@ let j=Math.floor(Math.random()*(i+1));
 
 }
 
-/* ===============================
-GAME LOGIC
-=============================== */
+/* =====================
+NEW WORD
+===================== */
 
 function newWord(){
 
-if(bag.length===0) refillBag();
+if(bag.length===0)refillBag();
 
 current=bag.pop();
 position=0;
@@ -284,6 +256,10 @@ spawnPhonemes();
 
 }
 
+/* =====================
+PHONEME BUTTONS
+===================== */
+
 function spawnPhonemes(){
 
 const container=document.getElementById("phonemes");
@@ -291,13 +267,17 @@ container.innerHTML="";
 
 let pool=[...new Set(current.phonemes)];
 
-/* add distractors */
+const distractors=[
+"ʃ","s","ɪ","iː","p","t","k","b","f","l","r","n",
+"d","g","m","v","z","ʒ","θ","ð"
+];
 
-const distractors=["ʃ","s","ɪ","iː","p","t","k","b","f","l","r","n"];
+while(pool.length<10){
 
-while(pool.length<8){
 let r=distractors[Math.floor(Math.random()*distractors.length)];
-if(!pool.includes(r)) pool.push(r);
+
+if(!pool.includes(r))pool.push(r);
+
 }
 
 pool.sort(()=>Math.random()-0.5);
@@ -316,14 +296,22 @@ container.appendChild(btn);
 
 }
 
+/* =====================
+PLAYER CHOICE
+===================== */
+
 function choose(p){
 
 const slot=document.getElementById("slot"+position);
 
+slot.classList.remove("flashCorrect","flashWrong");
+
 if(p===current.phonemes[position]){
 
 slot.textContent=p;
-slot.classList.add("correct","flashCorrect");
+
+slot.classList.add("correct");
+slot.classList.add("flashCorrect");
 
 playCorrect();
 
@@ -334,27 +322,28 @@ if(position>=current.phonemes.length){
 kills++;
 document.getElementById("killCount").textContent=kills;
 
-setTimeout(newWord,600);
+setTimeout(newWord,700);
 
 }
 
 }else{
 
-slot.classList.add("wrong","flashWrong");
+slot.classList.add("wrong");
+slot.classList.add("flashWrong");
 
 playWrong();
 
 setTimeout(()=>{
 slot.classList.remove("wrong","flashWrong");
-},300);
+},350);
 
 }
 
 }
 
-/* ===============================
-START
-=============================== */
+/* =====================
+START GAME
+===================== */
 
 refillBag();
 newWord();
