@@ -1,472 +1,221 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>AngloForge Combat</title>
+<title>Shoggoth Arena — Level 1</title>
 
 <style>
 
 body{
-background:#0a0f18;
-color:white;
-font-family:Arial,sans-serif;
-text-align:center;
-padding:10px;
+    background:#0b0b0f;
+    color:white;
+    font-family:Arial, Helvetica, sans-serif;
+    text-align:center;
 }
 
-#battlefield{
-max-width:600px;
-margin:auto;
+h1{
+    margin-top:20px;
 }
 
-#enemy-area{
-margin-top:20px;
-transition:0.1s;
+#arena{
+    margin-top:30px;
 }
 
-#enemy-sprite{
-font-size:70px;
-}
-
-#enemy-name{
-font-size:22px;
-color:#ffd36b;
-}
-
-.hpbar{
-width:220px;
-height:14px;
-background:#222;
-margin:6px auto;
-border:1px solid #555;
-}
-
-.hpfill{
-height:100%;
-background:#e74c3c;
-width:100%;
-}
-
-#player-area{
-margin-top:20px;
-}
-
-#player-sprite{
-font-size:60px;
-}
-
-#player-name{
-font-size:20px;
-color:#66d9ff;
-}
-
-#word-spotlight{
-margin-top:25px;
-font-size:32px;
-letter-spacing:3px;
-font-weight:bold;
-color:#4fc3ff;
-min-height:40px;
-}
-
-#kill-counter{
-margin-top:10px;
-font-size:18px;
-color:#8bdfff;
-}
-
-#mora-slots{
-margin-top:10px;
+.word{
+    font-size:40px;
+    letter-spacing:10px;
 }
 
 .slot{
-display:inline-block;
-width:55px;
-height:55px;
-border:2px solid #4fc3ff;
-line-height:55px;
-font-size:22px;
-margin:5px;
-background:#111a28;
-font-family:"DejaVu Sans","Noto Sans",Arial;
+    border-bottom:3px solid #666;
+    display:inline-block;
+    width:40px;
+    margin:5px;
+    transition:0.2s;
 }
 
-#cards{
-margin-top:15px;
+.correct{
+    color:#00ff88;
+    text-shadow:0 0 10px #00ff88;
 }
 
-.card{
-display:inline-block;
-padding:10px 14px;
-border:1px solid #4fc3ff;
-margin:5px;
-font-size:22px;
-cursor:pointer;
-background:#162233;
-font-family:"DejaVu Sans","Noto Sans",Arial;
+.wrong{
+    color:#ff3c3c;
+    text-shadow:0 0 10px #ff3c3c;
 }
 
-.card:hover{
-background:#22354d;
+#phonemes{
+    margin-top:30px;
 }
 
-button{
-margin-top:20px;
-padding:12px 30px;
-font-size:18px;
-background:#e74c3c;
-border:none;
-color:white;
+.phoneme{
+    display:inline-block;
+    padding:12px 20px;
+    margin:8px;
+    background:#222;
+    border-radius:6px;
+    cursor:pointer;
+    transition:0.2s;
 }
 
-#battle-log{
-margin-top:15px;
-min-height:30px;
-color:#ccc;
+.phoneme:hover{
+    background:#444;
 }
 
-.flash{
-animation:flash 0.2s;
-}
-
-@keyframes flash{
-0%{background:#ffffff;}
-100%{background:#0a0f18;}
-}
-
-.shake{
-animation:shake 0.2s;
-}
-
-@keyframes shake{
-0%{transform:translate(0,0);}
-25%{transform:translate(6px,0);}
-50%{transform:translate(-6px,0);}
-75%{transform:translate(6px,0);}
-100%{transform:translate(0,0);}
+#kills{
+    margin-top:30px;
+    font-size:22px;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<div id="battlefield">
+<h1>Shoggoth Arena</h1>
 
-<h2>ANGLOFORGE COMBAT</h2>
-
-<p>
-Defeat the sounds.<br>
-Arrange the phonemes in the correct order and strike.
-</p>
-
-<div id="enemy-area">
-<div id="enemy-sprite">👹</div>
-<div id="enemy-name"></div>
-
-<div class="hpbar">
-<div id="enemy-health" class="hpfill"></div>
-</div>
+<div id="arena">
+<div id="word" class="word"></div>
 </div>
 
-<div id="player-area">
-<div id="player-sprite">🛡</div>
-<div id="player-name">You</div>
+<div id="phonemes"></div>
 
-<div class="hpbar">
-<div id="player-health" class="hpfill"></div>
-</div>
-</div>
-
-<div id="word-spotlight"></div>
-
-<div id="kill-counter">Enemies defeated: 0</div>
-
-<div id="mora-slots"></div>
-
-<div id="cards"></div>
-
-<button onclick="validate()">ATTACK</button>
-
-<div id="battle-log"></div>
-
-</div>
+<div id="kills">Kills: <span id="killCount">0</span></div>
 
 <script>
 
-var audioUnlocked=false;
-var audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-
-function unlockAudio(){
-if(!audioUnlocked){
-audioCtx.resume();
-audioUnlocked=true;
-}
-}
-
-function playHit(){
-
-var o=audioCtx.createOscillator();
-var g=audioCtx.createGain();
-
-o.type="square";
-o.frequency.value=700;
-
-o.connect(g);
-g.connect(audioCtx.destination);
-
-g.gain.setValueAtTime(0.25,audioCtx.currentTime);
-g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.12);
-
-o.start();
-o.stop(audioCtx.currentTime+0.12);
-
-}
-
-function playEnemy(){
-
-var o=audioCtx.createOscillator();
-var g=audioCtx.createGain();
-
-o.type="sawtooth";
-o.frequency.value=130;
-
-o.connect(g);
-g.connect(audioCtx.destination);
-
-g.gain.setValueAtTime(0.3,audioCtx.currentTime);
-g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.25);
-
-o.start();
-o.stop(audioCtx.currentTime+0.25);
-
-}
-
-var playerHP=5;
-var kills=0;
-var startTime=0;
-
-var enemies=[
-
-{name:"Stop Soldier",sprite:"👺",word:"pan",phonemes:["p","æ","n"],mora:3,hp:1},
-{name:"Stop Soldier",sprite:"👺",word:"bat",phonemes:["b","æ","t"],mora:3,hp:1},
-{name:"Nasal Beast",sprite:"🐗",word:"man",phonemes:["m","æ","n"],mora:3,hp:1},
-{name:"Airflow Fiend",sprite:"🦂",word:"fan",phonemes:["f","æ","n"],mora:3,hp:1},
-{name:"Tooth Demon",sprite:"👹",word:"think",phonemes:["θ","ɪ","ŋ","k"],mora:4,hp:2},
-{name:"Forge Knight",sprite:"⚔️",word:"chair",phonemes:["tʃ","ɛ","r"],mora:3,hp:2},
-{name:"Liquid Spirit",sprite:"🌀",word:"red",phonemes:["r","ɛ","d"],mora:3,hp:2},
-{name:"Flap Assassin",sprite:"🗡",word:"water",phonemes:["w","ɔ","ɾ","ə","r"],mora:5,hp:2},
-{name:"Cluster Titan",sprite:"🗿",word:"strong",phonemes:["s","t","r","ɔ","ŋ"],mora:5,hp:3}
-
+const words = [
+{word:"ship", phonemes:["ʃ","ɪ","p"]},
+{word:"sheep", phonemes:["ʃ","iː","p"]},
+{word:"sit", phonemes:["s","ɪ","t"]},
+{word:"seat", phonemes:["s","iː","t"]}
 ];
 
-var currentEnemy;
-var enemyHP;
+let current;
+let position = 0;
+let kills = 0;
 
-function showWord(){
+/* AUDIO ENGINE */
 
-document.getElementById("word-spotlight").innerHTML=currentEnemy.word.toUpperCase();
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playCorrect(){
+let osc = audioCtx.createOscillator();
+let gain = audioCtx.createGain();
+
+osc.frequency.value = 700;
+osc.type = "triangle";
+
+gain.gain.value = 0.1;
+
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+
+osc.start();
+osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function playWrong(){
+let osc = audioCtx.createOscillator();
+let gain = audioCtx.createGain();
+
+osc.frequency.value = 140;
+osc.type = "sawtooth";
+
+gain.gain.value = 0.15;
+
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+
+osc.start();
+osc.stop(audioCtx.currentTime + 0.25);
+}
+
+/* GAME */
+
+function newWord(){
+
+current = words[Math.floor(Math.random()*words.length)];
+position = 0;
+
+const wordDiv = document.getElementById("word");
+wordDiv.innerHTML = "";
+
+for(let i=0;i<current.phonemes.length;i++){
+
+let span = document.createElement("span");
+span.className="slot";
+span.id="slot"+i;
+span.textContent="_";
+
+wordDiv.appendChild(span);
 
 }
 
-function loadEnemy(){
-
-var r=Math.floor(Math.random()*enemies.length);
-
-currentEnemy=enemies[r];
-enemyHP=currentEnemy.hp;
-
-document.getElementById("enemy-name").innerHTML=currentEnemy.name;
-document.getElementById("enemy-sprite").innerHTML=currentEnemy.sprite;
-
-showWord();
-updateHealth();
-renderSlots();
-renderCards();
-
-startTime=Date.now();
-
-document.getElementById("battle-log").innerHTML="A wild "+currentEnemy.name+" appears!";
+spawnPhonemes();
 
 }
 
-function updateHealth(){
+function spawnPhonemes(){
 
-document.getElementById("enemy-health").style.width=(enemyHP/currentEnemy.hp)*100+"%";
-document.getElementById("player-health").style.width=(playerHP/5)*100+"%";
+const pool = ["ʃ","s","ɪ","iː","p","t"];
 
-}
+const container = document.getElementById("phonemes");
+container.innerHTML="";
 
-function renderSlots(){
+pool.sort(()=>Math.random()-0.5);
 
-var box=document.getElementById("mora-slots");
-box.innerHTML="";
+pool.forEach(p=>{
 
-for(var i=0;i<currentEnemy.mora;i++){
+let btn = document.createElement("div");
+btn.className="phoneme";
+btn.textContent=p;
 
-var d=document.createElement("div");
-d.className="slot";
-d.onclick=function(){this.innerHTML="";};
+btn.onclick=()=>choose(p);
 
-box.appendChild(d);
+container.appendChild(btn);
 
-}
-
-}
-
-function placeCard(p){
-
-var slots=document.getElementsByClassName("slot");
-
-for(var i=0;i<slots.length;i++){
-
-if(slots[i].innerHTML===""){
-slots[i].innerHTML=p;
-return;
-}
+});
 
 }
 
-}
+function choose(p){
 
-function renderCards(){
+const slot = document.getElementById("slot"+position);
 
-var box=document.getElementById("cards");
-box.innerHTML="";
+if(p === current.phonemes[position]){
 
-var shuffled=[...currentEnemy.phonemes].sort(()=>Math.random()-0.5);
+slot.textContent=p;
+slot.classList.add("correct");
 
-for(var i=0;i<shuffled.length;i++){
+playCorrect();
 
-var c=document.createElement("div");
-c.className="card";
-c.innerHTML=shuffled[i];
+position++;
 
-c.onclick=function(){placeCard(this.innerHTML);};
-
-box.appendChild(c);
-
-}
-
-}
-
-function shakeEnemy(){
-
-var e=document.getElementById("enemy-area");
-
-e.classList.add("shake");
-
-setTimeout(function(){e.classList.remove("shake");},200);
-
-}
-
-function flashScreen(){
-
-document.body.classList.add("flash");
-
-setTimeout(function(){document.body.classList.remove("flash");},200);
-
-}
-
-function enemyAttack(){
-
-playerHP--;
-playEnemy();
-
-document.getElementById("battle-log").innerHTML=currentEnemy.name+" strikes back!";
-
-updateHealth();
-
-if(playerHP<=0){
-
-document.getElementById("battle-log").innerHTML="You were defeated. The Forge resets.";
-
-setTimeout(function(){
-
-playerHP=5;
-kills=0;
-
-document.getElementById("kill-counter").innerHTML="Enemies defeated: "+kills;
-
-loadEnemy();
-
-},1500);
-
-}
-
-}
-
-function validate(){
-
-unlockAudio();
-
-var slots=document.getElementsByClassName("slot");
-var correct=true;
-
-for(var i=0;i<currentEnemy.phonemes.length;i++){
-
-if(slots[i].innerHTML!=currentEnemy.phonemes[i]){
-correct=false;
-}
-
-}
-
-if(correct){
-
-var time=(Date.now()-startTime)/1000;
-
-var damage=1;
-
-if(time<3){
-damage=2;
-document.getElementById("battle-log").innerHTML="⚡ PERFECT STRIKE!";
-}else{
-document.getElementById("battle-log").innerHTML="Direct hit!";
-}
-
-enemyHP-=damage;
-
-flashScreen();
-shakeEnemy();
-playHit();
-
-updateHealth();
-
-if(enemyHP<=0){
+if(position >= current.phonemes.length){
 
 kills++;
+document.getElementById("killCount").textContent=kills;
 
-document.getElementById("kill-counter").innerHTML="Enemies defeated: "+kills;
-
-document.getElementById("battle-log").innerHTML="Enemy defeated!";
-
-setTimeout(loadEnemy,1000);
-
-}else{
-
-renderSlots();
+setTimeout(newWord,600);
 
 }
 
 }else{
 
-document.getElementById("battle-log").innerHTML="Attack failed.";
+slot.classList.add("wrong");
 
-for(var i=0;i<slots.length;i++){
-slots[i].innerHTML="";
-}
+playWrong();
 
-setTimeout(enemyAttack,700);
-
-}
+setTimeout(()=>{
+slot.classList.remove("wrong");
+},300);
 
 }
 
-loadEnemy();
+}
+
+newWord();
 
 </script>
 
