@@ -6,26 +6,30 @@
 
 <style>
 body{
-  background:black;
-  color:#00ff9c;
-  font-family:monospace;
-  text-align:center;
-  margin-top:80px;
+background:black;
+color:#00ff9c;
+font-family:monospace;
+text-align:center;
+margin-top:80px;
 }
 
 #word{
-  font-size:48px;
-  letter-spacing:6px;
-  margin:40px;
+font-size:48px;
+margin:40px;
 }
 
-#kills{
-  margin-top:30px;
-  font-size:20px;
+button{
+font-size:18px;
+margin:10px;
+padding:10px 20px;
+background:#111;
+color:#00ff9c;
+border:1px solid #00ff9c;
+cursor:pointer;
 }
 
 .green{color:#00ff9c;}
-.red{color:#ff3b3b;}
+.red{color:#ff4444;}
 </style>
 </head>
 
@@ -33,63 +37,42 @@ body{
 
 <h1>Shoggoth Arena</h1>
 
-<div id="word"></div>
+<div id="word">---</div>
+
+<button onclick="hit()">Attack</button>
+<button onclick="spawn()">Next</button>
 
 <div id="kills">Kills: 0</div>
 
 <script>
 
-const WORD_POOL = [
-"through","thought","tough","though","cough","bough","rough","thorough",
-"nation","nature","vision","measure","pressure","treasure","azure",
-"ship","sheep","chip","cheap","jeep","jump","judge",
-"thin","then","thing","this",
-"bat","bad","bag","back","bank","ban",
-"coat","code","coal","goal",
-"seat","seed","seam","seem",
-"rice","rise","ice","eyes",
-"lock","log","long","wrong",
-"sing","singer","finger",
-"shock","shack","shake",
-"storm","story","store",
-"flight","fight","light","night",
-"stone","stun","stain",
-"bread","break","breath",
-"train","trail","trade",
-"bright","bride","bridge",
-"crowd","crown","brown",
-"sound","round","found",
-"mount","mouse","mouth",
-"laugh","draft","craft",
-"ghost","ghast","ghoul"
+const WORDS=[
+"flight","night","light","through","thought","rough","tough",
+"ghost","ghoul","laugh","craft","draft","stone","storm",
+"sound","round","crown","brown","train","trail","bread",
+"break","bridge","bright","crowd","found","mount","mouth"
 ];
 
 let kills=0;
 
 function randomWord(){
-  return WORD_POOL[Math.floor(Math.random()*WORD_POOL.length)];
+return WORDS[Math.floor(Math.random()*WORDS.length)];
 }
 
 function spawn(){
-  document.getElementById("word").innerText=randomWord();
+document.getElementById("word").innerText=randomWord();
 }
 
-document.addEventListener("keydown",e=>{
-  const word=document.getElementById("word");
-
-  if(e.key==="f"){
-    word.className="green";
-    kills++;
-    document.getElementById("kills").innerText="Kills: "+kills;
-    setTimeout(()=>{spawn();word.className=""},200);
-  }
-
-  if(e.key==="j"){
-    word.className="red";
-    setTimeout(()=>{word.className=""},200);
-  }
-
-});
+function hit(){
+let w=document.getElementById("word");
+w.className="green";
+kills++;
+document.getElementById("kills").innerText="Kills: "+kills;
+setTimeout(()=>{
+w.className="";
+spawn();
+},200);
+}
 
 spawn();
 
