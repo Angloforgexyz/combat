@@ -198,9 +198,15 @@ Arrange the phonemes in the correct order and strike.
 
 <script>
 
-/* AUDIO ENGINE */
-
+var audioUnlocked=false;
 var audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+
+function unlockAudio(){
+if(!audioUnlocked){
+audioCtx.resume();
+audioUnlocked=true;
+}
+}
 
 function playHit(){
 
@@ -240,8 +246,6 @@ o.stop(audioCtx.currentTime+0.25);
 
 }
 
-/* GAME */
-
 var playerHP=5;
 var kills=0;
 var startTime=0;
@@ -250,19 +254,12 @@ var enemies=[
 
 {name:"Stop Soldier",sprite:"👺",word:"pan",phonemes:["p","æ","n"],mora:3,hp:1},
 {name:"Stop Soldier",sprite:"👺",word:"bat",phonemes:["b","æ","t"],mora:3,hp:1},
-
 {name:"Nasal Beast",sprite:"🐗",word:"man",phonemes:["m","æ","n"],mora:3,hp:1},
-
 {name:"Airflow Fiend",sprite:"🦂",word:"fan",phonemes:["f","æ","n"],mora:3,hp:1},
-
 {name:"Tooth Demon",sprite:"👹",word:"think",phonemes:["θ","ɪ","ŋ","k"],mora:4,hp:2},
-
 {name:"Forge Knight",sprite:"⚔️",word:"chair",phonemes:["tʃ","ɛ","r"],mora:3,hp:2},
-
 {name:"Liquid Spirit",sprite:"🌀",word:"red",phonemes:["r","ɛ","d"],mora:3,hp:2},
-
 {name:"Flap Assassin",sprite:"🗡",word:"water",phonemes:["w","ɔ","ɾ","ə","r"],mora:5,hp:2},
-
 {name:"Cluster Titan",sprite:"🗿",word:"strong",phonemes:["s","t","r","ɔ","ŋ"],mora:5,hp:3}
 
 ];
@@ -272,8 +269,7 @@ var enemyHP;
 
 function showWord(){
 
-document.getElementById("word-spotlight").innerHTML=
-currentEnemy.word.toUpperCase();
+document.getElementById("word-spotlight").innerHTML=currentEnemy.word.toUpperCase();
 
 }
 
@@ -294,18 +290,14 @@ renderCards();
 
 startTime=Date.now();
 
-document.getElementById("battle-log").innerHTML=
-"A wild "+currentEnemy.name+" appears!";
+document.getElementById("battle-log").innerHTML="A wild "+currentEnemy.name+" appears!";
 
 }
 
 function updateHealth(){
 
-document.getElementById("enemy-health").style.width=
-(enemyHP/currentEnemy.hp)*100+"%";
-
-document.getElementById("player-health").style.width=
-(playerHP/5)*100+"%";
+document.getElementById("enemy-health").style.width=(enemyHP/currentEnemy.hp)*100+"%";
+document.getElementById("player-health").style.width=(playerHP/5)*100+"%";
 
 }
 
@@ -318,7 +310,6 @@ for(var i=0;i<currentEnemy.mora;i++){
 
 var d=document.createElement("div");
 d.className="slot";
-
 d.onclick=function(){this.innerHTML="";};
 
 box.appendChild(d);
@@ -386,23 +377,20 @@ function enemyAttack(){
 playerHP--;
 playEnemy();
 
-document.getElementById("battle-log").innerHTML=
-currentEnemy.name+" strikes back!";
+document.getElementById("battle-log").innerHTML=currentEnemy.name+" strikes back!";
 
 updateHealth();
 
 if(playerHP<=0){
 
-document.getElementById("battle-log").innerHTML=
-"You were defeated. The Forge resets.";
+document.getElementById("battle-log").innerHTML="You were defeated. The Forge resets.";
 
 setTimeout(function(){
 
 playerHP=5;
 kills=0;
 
-document.getElementById("kill-counter").innerHTML=
-"Enemies defeated: "+kills;
+document.getElementById("kill-counter").innerHTML="Enemies defeated: "+kills;
 
 loadEnemy();
 
@@ -413,6 +401,8 @@ loadEnemy();
 }
 
 function validate(){
+
+unlockAudio();
 
 var slots=document.getElementsByClassName("slot");
 var correct=true;
@@ -450,8 +440,7 @@ if(enemyHP<=0){
 
 kills++;
 
-document.getElementById("kill-counter").innerHTML=
-"Enemies defeated: "+kills;
+document.getElementById("kill-counter").innerHTML="Enemies defeated: "+kills;
 
 document.getElementById("battle-log").innerHTML="Enemy defeated!";
 
