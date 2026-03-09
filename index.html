@@ -1,91 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Shoggoth Arena</title>
 
 <style>
-
 body{
-background:#0b0b0f;
-color:white;
-font-family:Arial, Helvetica, sans-serif;
-text-align:center;
+  background:black;
+  color:#00ff9c;
+  font-family:monospace;
+  text-align:center;
+  margin-top:80px;
 }
 
-h1{
-margin-top:20px;
-}
-
-#arena{
-margin-top:40px;
-}
-
-.word{
-font-size:42px;
-letter-spacing:10px;
-}
-
-.slot{
-border-bottom:3px solid #555;
-display:inline-block;
-width:45px;
-margin:6px;
-transition:0.15s;
-}
-
-.correct{
-color:#00ff88;
-text-shadow:0 0 15px #00ff88;
-}
-
-.wrong{
-color:#ff4040;
-text-shadow:0 0 15px #ff4040;
-}
-
-.flashCorrect{
-animation:flashGreen 0.3s;
-}
-
-.flashWrong{
-animation:flashRed 0.3s;
-}
-
-@keyframes flashGreen{
-0%{background:#00ff88}
-100%{background:transparent}
-}
-
-@keyframes flashRed{
-0%{background:#ff4040}
-100%{background:transparent}
-}
-
-#phonemes{
-margin-top:40px;
-}
-
-.phoneme{
-display:inline-block;
-padding:14px 22px;
-margin:8px;
-background:#222;
-border-radius:6px;
-cursor:pointer;
-font-size:20px;
-transition:0.15s;
-}
-
-.phoneme:hover{
-background:#444;
+#word{
+  font-size:48px;
+  letter-spacing:6px;
+  margin:40px;
 }
 
 #kills{
-margin-top:40px;
-font-size:24px;
+  margin-top:30px;
+  font-size:20px;
 }
 
+.green{color:#00ff9c;}
+.red{color:#ff3b3b;}
 </style>
 </head>
 
@@ -93,260 +33,65 @@ font-size:24px;
 
 <h1>Shoggoth Arena</h1>
 
-<div id="arena">
-<div id="word" class="word"></div>
-</div>
+<div id="word"></div>
 
-<div id="phonemes"></div>
-
-<div id="kills">Kills: <span id="killCount">0</span></div>
+<div id="kills">Kills: 0</div>
 
 <script>
 
-/* =====================
-UNLOCK AUDIO
-===================== */
-
-let audioUnlocked=false;
-const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-
-document.body.addEventListener("click",()=>{
-if(!audioUnlocked){
-audioCtx.resume();
-audioUnlocked=true;
-}
-});
-
-/* =====================
-SOUNDS
-===================== */
-
-function playCorrect(){
-
-let osc=audioCtx.createOscillator();
-let gain=audioCtx.createGain();
-
-osc.type="triangle";
-osc.frequency.value=850;
-
-gain.gain.value=0.18;
-
-osc.connect(gain);
-gain.connect(audioCtx.destination);
-
-osc.start();
-osc.stop(audioCtx.currentTime+0.15);
-
-}
-
-function playWrong(){
-
-let osc=audioCtx.createOscillator();
-let gain=audioCtx.createGain();
-
-osc.type="sawtooth";
-osc.frequency.value=120;
-
-gain.gain.value=0.2;
-
-osc.connect(gain);
-gain.connect(audioCtx.destination);
-
-osc.start();
-osc.stop(audioCtx.currentTime+0.25);
-
-}
-
-/* =====================
-WORD POOL
-===================== */
-
-const words=[
-
-{word:"ship",phonemes:["ʃ","ɪ","p"]},
-{word:"sheep",phonemes:["ʃ","iː","p"]},
-{word:"sit",phonemes:["s","ɪ","t"]},
-{word:"seat",phonemes:["s","iː","t"]},
-{word:"bit",phonemes:["b","ɪ","t"]},
-{word:"beat",phonemes:["b","iː","t"]},
-{word:"fill",phonemes:["f","ɪ","l"]},
-{word:"feel",phonemes:["f","iː","l"]},
-{word:"live",phonemes:["l","ɪ","v"]},
-{word:"leave",phonemes:["l","iː","v"]},
-{word:"slip",phonemes:["s","l","ɪ","p"]},
-{word:"sleep",phonemes:["s","l","iː","p"]},
-
-{word:"beach",phonemes:["b","iː","tʃ"]},
-{word:"cheap",phonemes:["tʃ","iː","p"]},
-{word:"sheet",phonemes:["ʃ","iː","t"]},
-{word:"cheese",phonemes:["tʃ","iː","z"]},
-{word:"peach",phonemes:["p","iː","tʃ"]},
-
-{word:"though",phonemes:["ð","oʊ"]},
-{word:"through",phonemes:["θ","r","uː"]},
-{word:"thought",phonemes:["θ","ɔː","t"]},
-{word:"tough",phonemes:["t","ʌ","f"]},
-{word:"rough",phonemes:["r","ʌ","f"]},
-{word:"cough",phonemes:["k","ɒ","f"]},
-{word:"enough",phonemes:["ɪ","n","ʌ","f"]},
-
-{word:"people",phonemes:["p","iː","p","l"]},
-{word:"business",phonemes:["b","ɪ","z","n","ɪ","s"]},
-{word:"different",phonemes:["d","ɪ","f","r","ə","n","t"]},
-{word:"interesting",phonemes:["ɪ","n","t","r","ə","s","t","ɪ","ŋ"]},
-
-{word:"choir",phonemes:["k","w","aɪ","r"]},
-{word:"chaos",phonemes:["k","eɪ","ɒ","s"]},
-{word:"sword",phonemes:["s","ɔː","r","d"]},
-{word:"island",phonemes:["aɪ","l","ə","n","d"]},
-
-{word:"sleepy",phonemes:["s","l","iː","p","i"]},
-{word:"sneaky",phonemes:["s","n","iː","k","i"]},
-{word:"sheepdog",phonemes:["ʃ","iː","p","d","ɒ","g"]},
-{word:"spaceship",phonemes:["s","p","eɪ","s","ʃ","ɪ","p"]}
-
+const WORD_POOL = [
+"through","thought","tough","though","cough","bough","rough","thorough",
+"nation","nature","vision","measure","pressure","treasure","azure",
+"ship","sheep","chip","cheap","jeep","jump","judge",
+"thin","then","thing","this",
+"bat","bad","bag","back","bank","ban",
+"coat","code","coal","goal",
+"seat","seed","seam","seem",
+"rice","rise","ice","eyes",
+"lock","log","long","wrong",
+"sing","singer","finger",
+"shock","shack","shake",
+"storm","story","store",
+"flight","fight","light","night",
+"stone","stun","stain",
+"bread","break","breath",
+"train","trail","trade",
+"bright","bride","bridge",
+"crowd","crown","brown",
+"sound","round","found",
+"mount","mouse","mouth",
+"laugh","draft","craft",
+"ghost","ghast","ghoul"
 ];
 
-/* =====================
-SHUFFLE BAG
-===================== */
-
-let bag=[];
-let current;
-let position=0;
 let kills=0;
 
-function refillBag(){
-
-bag=[...words];
-
-for(let i=bag.length-1;i>0;i--){
-let j=Math.floor(Math.random()*(i+1));
-[bag[i],bag[j]]=[bag[j],bag[i]];
+function randomWord(){
+  return WORD_POOL[Math.floor(Math.random()*WORD_POOL.length)];
 }
 
+function spawn(){
+  document.getElementById("word").innerText=randomWord();
 }
 
-/* =====================
-NEW WORD
-===================== */
+document.addEventListener("keydown",e=>{
+  const word=document.getElementById("word");
 
-function newWord(){
+  if(e.key==="f"){
+    word.className="green";
+    kills++;
+    document.getElementById("kills").innerText="Kills: "+kills;
+    setTimeout(()=>{spawn();word.className=""},200);
+  }
 
-if(bag.length===0)refillBag();
-
-current=bag.pop();
-position=0;
-
-const wordDiv=document.getElementById("word");
-wordDiv.innerHTML="";
-
-for(let i=0;i<current.phonemes.length;i++){
-
-let span=document.createElement("span");
-span.className="slot";
-span.id="slot"+i;
-span.textContent="_";
-
-wordDiv.appendChild(span);
-
-}
-
-spawnPhonemes();
-
-}
-
-/* =====================
-PHONEME BUTTONS
-===================== */
-
-function spawnPhonemes(){
-
-const container=document.getElementById("phonemes");
-container.innerHTML="";
-
-let pool=[...new Set(current.phonemes)];
-
-const distractors=[
-"ʃ","s","ɪ","iː","p","t","k","b","f","l","r","n",
-"d","g","m","v","z","ʒ","θ","ð"
-];
-
-while(pool.length<10){
-
-let r=distractors[Math.floor(Math.random()*distractors.length)];
-
-if(!pool.includes(r))pool.push(r);
-
-}
-
-pool.sort(()=>Math.random()-0.5);
-
-pool.forEach(p=>{
-
-let btn=document.createElement("div");
-btn.className="phoneme";
-btn.textContent=p;
-
-btn.onclick=()=>choose(p);
-
-container.appendChild(btn);
+  if(e.key==="j"){
+    word.className="red";
+    setTimeout(()=>{word.className=""},200);
+  }
 
 });
 
-}
-
-/* =====================
-PLAYER CHOICE
-===================== */
-
-function choose(p){
-
-const slot=document.getElementById("slot"+position);
-
-slot.classList.remove("flashCorrect","flashWrong");
-
-if(p===current.phonemes[position]){
-
-slot.textContent=p;
-
-slot.classList.add("correct");
-slot.classList.add("flashCorrect");
-
-playCorrect();
-
-position++;
-
-if(position>=current.phonemes.length){
-
-kills++;
-document.getElementById("killCount").textContent=kills;
-
-setTimeout(newWord,700);
-
-}
-
-}else{
-
-slot.classList.add("wrong");
-slot.classList.add("flashWrong");
-
-playWrong();
-
-setTimeout(()=>{
-slot.classList.remove("wrong","flashWrong");
-},350);
-
-}
-
-}
-
-/* =====================
-START GAME
-===================== */
-
-refillBag();
-newWord();
+spawn();
 
 </script>
 
