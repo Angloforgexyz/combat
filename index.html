@@ -6,30 +6,51 @@
 
 <style>
 body{
-background:black;
+background:#000;
 color:#00ff9c;
 font-family:monospace;
 text-align:center;
 margin-top:80px;
 }
 
+h1{margin-bottom:40px;}
+
 #word{
 font-size:48px;
-margin:40px;
+letter-spacing:4px;
+margin:30px;
+transition:0.15s;
 }
 
 button{
 font-size:18px;
-margin:10px;
 padding:10px 20px;
+margin:10px;
 background:#111;
 color:#00ff9c;
 border:1px solid #00ff9c;
 cursor:pointer;
 }
 
-.green{color:#00ff9c;}
-.red{color:#ff4444;}
+button:hover{
+background:#00ff9c;
+color:#000;
+}
+
+.green{
+color:#00ff9c;
+transform:scale(1.15);
+}
+
+.red{
+color:#ff3b3b;
+transform:scale(1.15);
+}
+
+#kills{
+margin-top:30px;
+font-size:20px;
+}
 </style>
 </head>
 
@@ -39,39 +60,105 @@ cursor:pointer;
 
 <div id="word">---</div>
 
-<button onclick="hit()">Attack</button>
-<button onclick="spawn()">Next</button>
+<div>
+<button onclick="attack()">Attack</button>
+<button onclick="skip()">Skip</button>
+</div>
 
 <div id="kills">Kills: 0</div>
 
 <script>
 
-const WORDS=[
-"flight","night","light","through","thought","rough","tough",
-"ghost","ghoul","laugh","craft","draft","stone","storm",
-"sound","round","crown","brown","train","trail","bread",
-"break","bridge","bright","crowd","found","mount","mouth"
+const WORD_POOL = [
+"through","thought","tough","though","cough","bough","rough","thorough",
+"nation","nature","vision","measure","pressure","treasure","azure",
+"ship","sheep","chip","cheap","jeep","jump","judge",
+"thin","then","thing","this",
+"bat","bad","bag","back","bank","ban",
+"coat","code","coal","goal",
+"seat","seed","seam","seem",
+"rice","rise","ice","eyes",
+"lock","log","long","wrong",
+"sing","singer","finger",
+"shock","shack","shake",
+"storm","story","store",
+"flight","fight","light","night",
+"stone","stun","stain",
+"bread","break","breath",
+"train","trail","trade",
+"bright","bride","bridge",
+"crowd","crown","brown",
+"sound","round","found",
+"mount","mouse","mouth",
+"laugh","draft","craft",
+"ghost","ghast","ghoul",
+"judge","jungle","gentle",
+"flood","blood","good",
+"would","could","should",
+"knight","knife","knee",
+"write","wrong","wrap",
+"psych","pneuma","gnome"
 ];
 
 let kills=0;
+let current="";
+let audioCtx;
+
+function initAudio(){
+if(!audioCtx){
+audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+}
+}
+
+function beep(freq,time=0.15){
+initAudio();
+const osc=audioCtx.createOscillator();
+const gain=audioCtx.createGain();
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.frequency.value=freq;
+osc.start();
+gain.gain.setValueAtTime(0.2,audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(
+0.0001,
+audioCtx.currentTime+time
+);
+osc.stop(audioCtx.currentTime+time);
+}
 
 function randomWord(){
-return WORDS[Math.floor(Math.random()*WORDS.length)];
+return WORD_POOL[Math.floor(Math.random()*WORD_POOL.length)];
 }
 
 function spawn(){
-document.getElementById("word").innerText=randomWord();
+current=randomWord();
+document.getElementById("word").className="";
+document.getElementById("word").innerText=current;
 }
 
-function hit(){
+function attack(){
+
 let w=document.getElementById("word");
+
+if(Math.random()>0.3){
+
+beep(700);
 w.className="green";
 kills++;
 document.getElementById("kills").innerText="Kills: "+kills;
-setTimeout(()=>{
-w.className="";
+
+}else{
+
+beep(180);
+w.className="red";
+
+}
+
+setTimeout(spawn,250);
+}
+
+function skip(){
 spawn();
-},200);
 }
 
 spawn();
