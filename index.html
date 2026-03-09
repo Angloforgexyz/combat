@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -120,9 +119,17 @@ Arrange the phonemes in the correct order and strike.
 <button onclick="validate()">ATTACK</button>
 <div id="battle-log"></div>
 </div>
+
 <script>
+
 var playerHP=5;
+
+/* NEW: shuffle bag system */
+var enemyBag=[];
+var enemyIndex=0;
+
 var enemies=[
+/* your entire enemy list unchanged */
 {name:"Stop Soldier",sprite:"👺",word:"pan",phonemes:["p","æ","n"],mora:3,hp:1},
 {name:"Stop Soldier",sprite:"👺",word:"pen",phonemes:["p","ɛ","n"],mora:3,hp:1},
 {name:"Stop Soldier",sprite:"👺",word:"bat",phonemes:["b","æ","t"],mora:3,hp:1},
@@ -174,40 +181,56 @@ var enemies=[
 {name:"Cluster Titan",sprite:"🗿",word:"strong",phonemes:["s","t","r","ɔ","ŋ"],mora:5,hp:3},
 {name:"Cluster Titan",sprite:"🗿",word:"play",phonemes:["p","l","eɪ"],mora:3,hp:2}
 ];
+
 var currentEnemy;
 var enemyHP;
+
 function loadEnemy(){
-var r=Math.floor(Math.random()*enemies.length);
-currentEnemy=enemies[r];
+
+if(enemyIndex>=enemyBag.length){
+enemyBag=[...enemies].sort(()=>Math.random()-0.5);
+enemyIndex=0;
+}
+
+currentEnemy=enemyBag[enemyIndex];
+enemyIndex++;
+
 enemyHP=currentEnemy.hp;
+
 document.getElementById("enemy-name").innerHTML=
 currentEnemy.name+" ["+currentEnemy.word+"]";
+
 document.getElementById("enemy-sprite").innerHTML=
 currentEnemy.sprite;
+
 updateHealth();
 renderSlots();
 renderCards();
+
 document.getElementById("battle-log").innerHTML=
 "A wild "+currentEnemy.name+" appears!";
 }
+
 function updateHealth(){
 var enemyPercent=(enemyHP/currentEnemy.hp)*100;
 document.getElementById("enemy-health").style.width=enemyPercent+"%";
 var playerPercent=(playerHP/5)*100;
 document.getElementById("player-health").style.width=playerPercent+"%";
 }
+
+/* rest of your code unchanged */
+
 function renderSlots(){
 var box=document.getElementById("mora-slots");
 box.innerHTML="";
 for(var i=0;i<currentEnemy.mora;i++){
 var d=document.createElement("div");
 d.className="slot";
-d.onclick=function(){
-this.innerHTML="";
-};
+d.onclick=function(){this.innerHTML="";};
 box.appendChild(d);
 }
 }
+
 function placeCard(p){
 var slots=document.getElementsByClassName("slot");
 for(var i=0;i<slots.length;i++){
@@ -217,6 +240,7 @@ return;
 }
 }
 }
+
 function renderCards(){
 var box=document.getElementById("cards");
 box.innerHTML="";
@@ -226,62 +250,44 @@ var p=shuffled[i];
 var c=document.createElement("div");
 c.className="card";
 c.innerHTML=p;
-c.onclick=function(){
-placeCard(this.innerHTML);
-};
+c.onclick=function(){placeCard(this.innerHTML);};
 box.appendChild(c);
 }
 }
+
 function enemyAttack(){
 playerHP--;
-document.getElementById("battle-log").innerHTML=
-currentEnemy.name+" strikes back!";
+document.getElementById("battle-log").innerHTML=currentEnemy.name+" strikes back!";
 updateHealth();
 if(playerHP<=0){
-document.getElementById("battle-log").innerHTML=
-"You were defeated. The Forge resets.";
-setTimeout(function(){
-playerHP=5;
-loadEnemy();
-},1500);
+document.getElementById("battle-log").innerHTML="You were defeated. The Forge resets.";
+setTimeout(function(){playerHP=5;loadEnemy();},1500);
 }
 }
+
 function validate(){
 var slots=document.getElementsByClassName("slot");
 var correct=true;
 for(var i=0;i<currentEnemy.phonemes.length;i++){
-if(slots[i].innerHTML!=currentEnemy.phonemes[i]){
-correct=false;
-}
+if(slots[i].innerHTML!=currentEnemy.phonemes[i]){correct=false;}
 }
 if(correct){
 enemyHP--;
 document.getElementById("battle-log").innerHTML="Direct hit!";
 updateHealth();
 if(enemyHP<=0){
-document.getElementById("battle-log").innerHTML=
-"Enemy defeated!";
+document.getElementById("battle-log").innerHTML="Enemy defeated!";
 setTimeout(loadEnemy,1000);
+}else{renderSlots();}
 }else{
-renderSlots();
-}
-}else{
-document.getElementById("battle-log").innerHTML=
-"Attack failed.";
-for(var i=0;i<slots.length;i++){
-slots[i].innerHTML="";
-}
+document.getElementById("battle-log").innerHTML="Attack failed.";
+for(var i=0;i<slots.length;i++){slots[i].innerHTML="";}
 setTimeout(enemyAttack,700);
 }
 }
+
 loadEnemy();
+
 </script>
 </body>
 </html>
-0 commit comments
-Comments
-0
- (0)
-Comment
-You're not receiving notifications from this thread.
-
