@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+-<!DOCTYPE html>
 
 <html>
 <head>
@@ -62,8 +62,21 @@ font-size:20px;
 color:#66d9ff;
 }
 
-#mora-slots{
+/* WORD SPOTLIGHT */
+
+#word-spotlight{
 margin-top:25px;
+font-size:32px;
+letter-spacing:3px;
+font-weight:bold;
+color:#4fc3ff;
+min-height:40px;
+}
+
+/* SLOTS */
+
+#mora-slots{
+margin-top:10px;
 }
 
 .slot{
@@ -145,7 +158,10 @@ Arrange the phonemes in the correct order and strike.
 </div>
 </div>
 
+<div id="word-spotlight"></div>
+
 <div id="mora-slots"></div>
+
 <div id="cards"></div>
 
 <button onclick="validate()">ATTACK</button>
@@ -172,57 +188,36 @@ var enemies=[
 {name:"Nasal Beast",sprite:"🐗",word:"man",phonemes:["m","æ","n"],mora:3,hp:1},
 {name:"Nasal Beast",sprite:"🐗",word:"name",phonemes:["n","eɪ","m"],mora:3,hp:1},
 {name:"Nasal Beast",sprite:"🐗",word:"moon",phonemes:["m","uː","n"],mora:3,hp:1},
-{name:"Nasal Beast",sprite:"🐗",word:"nine",phonemes:["n","aɪ","n"],mora:3,hp:1},
-{name:"Nasal Beast",sprite:"🐗",word:"sing",phonemes:["s","ɪ","ŋ"],mora:3,hp:1},
-{name:"Nasal Beast",sprite:"🐗",word:"long",phonemes:["l","ɒ","ŋ"],mora:3,hp:1},
 
 {name:"Airflow Fiend",sprite:"🦂",word:"fan",phonemes:["f","æ","n"],mora:3,hp:1},
 {name:"Airflow Fiend",sprite:"🦂",word:"five",phonemes:["f","aɪ","v"],mora:3,hp:1},
 {name:"Airflow Fiend",sprite:"🦂",word:"van",phonemes:["v","æ","n"],mora:3,hp:1},
-{name:"Airflow Fiend",sprite:"🦂",word:"save",phonemes:["s","eɪ","v"],mora:3,hp:1},
-{name:"Airflow Fiend",sprite:"🦂",word:"sun",phonemes:["s","ʌ","n"],mora:3,hp:1},
-{name:"Airflow Fiend",sprite:"🦂",word:"zoo",phonemes:["z","uː"],mora:2,hp:1},
-{name:"Airflow Fiend",sprite:"🦂",word:"she",phonemes:["ʃ","iː"],mora:2,hp:1},
-{name:"Airflow Fiend",sprite:"🦂",word:"measure",phonemes:["m","ɛ","ʒ","ə"],mora:4,hp:2},
-{name:"Airflow Fiend",sprite:"🦂",word:"house",phonemes:["h","aʊ","s"],mora:3,hp:1},
-{name:"Airflow Fiend",sprite:"🦂",word:"heat",phonemes:["h","iː","t"],mora:3,hp:1},
 
 {name:"Tooth Demon",sprite:"👹",word:"think",phonemes:["θ","ɪ","ŋ","k"],mora:4,hp:2},
-{name:"Tooth Demon",sprite:"👹",word:"thank",phonemes:["θ","æ","ŋ","k"],mora:4,hp:2},
-{name:"Tooth Demon",sprite:"👹",word:"thin",phonemes:["θ","ɪ","n"],mora:3,hp:2},
-{name:"Tooth Demon",sprite:"👹",word:"three",phonemes:["θ","r","iː"],mora:3,hp:2},
 {name:"Tooth Demon",sprite:"👹",word:"this",phonemes:["ð","ɪ","s"],mora:3,hp:2},
-{name:"Tooth Demon",sprite:"👹",word:"that",phonemes:["ð","æ","t"],mora:3,hp:2},
-{name:"Tooth Demon",sprite:"👹",word:"them",phonemes:["ð","ɛ","m"],mora:3,hp:2},
-{name:"Tooth Demon",sprite:"👹",word:"those",phonemes:["ð","oʊ","z"],mora:3,hp:2},
 
 {name:"Forge Knight",sprite:"⚔️",word:"chair",phonemes:["tʃ","ɛ","r"],mora:3,hp:2},
-{name:"Forge Knight",sprite:"⚔️",word:"cheese",phonemes:["tʃ","iː","z"],mora:3,hp:2},
-{name:"Forge Knight",sprite:"⚔️",word:"jump",phonemes:["dʒ","ʌ","m","p"],mora:4,hp:2},
-{name:"Forge Knight",sprite:"⚔️",word:"joke",phonemes:["dʒ","oʊ","k"],mora:3,hp:2},
 
 {name:"Liquid Spirit",sprite:"🌀",word:"red",phonemes:["r","ɛ","d"],mora:3,hp:2},
-{name:"Liquid Spirit",sprite:"🌀",word:"road",phonemes:["r","oʊ","d"],mora:3,hp:2},
-{name:"Liquid Spirit",sprite:"🌀",word:"light",phonemes:["l","aɪ","t"],mora:3,hp:2},
-{name:"Liquid Spirit",sprite:"🌀",word:"lake",phonemes:["l","eɪ","k"],mora:3,hp:2},
 
 {name:"Glide Phantom",sprite:"🦅",word:"we",phonemes:["w","iː"],mora:2,hp:1},
-{name:"Glide Phantom",sprite:"🦅",word:"win",phonemes:["w","ɪ","n"],mora:3,hp:1},
-{name:"Glide Phantom",sprite:"🦅",word:"yes",phonemes:["j","ɛ","s"],mora:3,hp:1},
-{name:"Glide Phantom",sprite:"🦅",word:"yellow",phonemes:["j","ɛ","l","oʊ"],mora:4,hp:2},
 
 {name:"Flap Assassin",sprite:"🗡",word:"water",phonemes:["w","ɔ","ɾ","ə","r"],mora:5,hp:2},
-{name:"Flap Assassin",sprite:"🗡",word:"better",phonemes:["b","ɛ","ɾ","ə","r"],mora:5,hp:2},
-{name:"Flap Assassin",sprite:"🗡",word:"city",phonemes:["s","ɪ","ɾ","i"],mora:4,hp:2},
-{name:"Flap Assassin",sprite:"🗡",word:"writer",phonemes:["r","aɪ","ɾ","ə","r"],mora:5,hp:2},
 
-{name:"Cluster Titan",sprite:"🗿",word:"strong",phonemes:["s","t","r","ɔ","ŋ"],mora:5,hp:3},
-{name:"Cluster Titan",sprite:"🗿",word:"play",phonemes:["p","l","eɪ"],mora:3,hp:2}
+{name:"Cluster Titan",sprite:"🗿",word:"strong",phonemes:["s","t","r","ɔ","ŋ"],mora:5,hp:3}
 
 ];
 
 var currentEnemy;
 var enemyHP;
+
+function showWordSpotlight(){
+
+var display=currentEnemy.word.toUpperCase();
+
+document.getElementById("word-spotlight").innerHTML=display;
+
+}
 
 function loadEnemy(){
 
@@ -232,10 +227,12 @@ currentEnemy=enemies[r];
 enemyHP=currentEnemy.hp;
 
 document.getElementById("enemy-name").innerHTML=
-currentEnemy.name+" ["+currentEnemy.word+"]";
+currentEnemy.name;
 
 document.getElementById("enemy-sprite").innerHTML=
 currentEnemy.sprite;
+
+showWordSpotlight();
 
 updateHealth();
 renderSlots();
