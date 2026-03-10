@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -75,7 +75,6 @@ line-height:55px;
 font-size:22px;
 margin:5px;
 background:#111a28;
-font-family:"DejaVu Sans","Noto Sans",Arial;
 }
 
 #cards{
@@ -90,7 +89,6 @@ margin:5px;
 font-size:22px;
 cursor:pointer;
 background:#162233;
-font-family:"DejaVu Sans","Noto Sans",Arial;
 }
 
 .card:hover{
@@ -122,13 +120,6 @@ color:#7fd8ff;
 font-size:18px;
 text-decoration:none;
 border-radius:6px;
-box-shadow:0 0 8px rgba(79,195,255,0.4);
-transition:all 0.15s ease;
-}
-
-.forge-manual:hover{
-background:#22354d;
-box-shadow:0 0 14px rgba(79,195,255,0.9);
 }
 
 </style>
@@ -148,23 +139,27 @@ Arrange the phonemes in the correct order and strike.
 <a class="forge-manual"
 href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html"
 target="_blank">
-📜 Learn the battle moves
+Learn the battle moves
 </a>
 
 <div id="enemy-area">
 <div id="enemy-sprite">👹</div>
 <div id="enemy-name"></div>
+
 <div class="hpbar">
 <div id="enemy-health" class="hpfill"></div>
 </div>
 </div>
 
 <div id="player-area">
+
 <div id="player-sprite">🛡</div>
 <div id="player-name">You</div>
+
 <div class="hpbar">
 <div id="player-health" class="hpfill"></div>
 </div>
+
 </div>
 
 <div id="mora-slots"></div>
@@ -179,12 +174,11 @@ target="_blank">
 
 <script>
 
+/* PLAYER */
+
 var playerHP=5;
 
-var enemyBag=[];
-var enemyIndex=0;
-
-/* ---------- CORE WORDS ---------- */
+/* ENEMY WORDS */
 
 var enemies=[
 
@@ -211,36 +205,35 @@ var enemies=[
 
 ];
 
-/* --------- AUTO EXPAND TO 333 -------- */
+/* ENEMY BAG SYSTEM */
 
-var base=[...enemies];
+var enemyBag=[];
+var enemyIndex=0;
 
-while(enemies.length<333){
+function shuffleEnemies(){
 
-var w=base[Math.floor(Math.random()*base.length)];
+enemyBag=[...enemies];
 
-var clone={
-name:w.name,
-sprite:w.sprite,
-phonemes:[...w.phonemes],
-mora:w.mora,
-hp:w.hp
-};
+for(let i=enemyBag.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1));
+[enemyBag[i],enemyBag[j]]=[enemyBag[j],enemyBag[i]];
+}
 
-enemies.push(clone);
+enemyIndex=0;
 
 }
 
-/* --------- GAME ENGINE -------- */
+/* GAME STATE */
 
 var currentEnemy;
 var enemyHP;
 
+/* LOAD ENEMY */
+
 function loadEnemy(){
 
 if(enemyIndex>=enemyBag.length){
-enemyBag=[...enemies].sort(()=>Math.random()-0.5);
-enemyIndex=0;
+shuffleEnemies();
 }
 
 currentEnemy=enemyBag[enemyIndex];
@@ -248,28 +241,33 @@ enemyIndex++;
 
 enemyHP=currentEnemy.hp;
 
-var w=currentEnemy.name;
-var formatted=w.charAt(0).toUpperCase()+w.slice(1);
+document.getElementById("enemy-name").innerHTML=
+currentEnemy.name.charAt(0).toUpperCase()+currentEnemy.name.slice(1);
 
-document.getElementById("enemy-name").innerHTML=formatted;
 document.getElementById("enemy-sprite").innerHTML=currentEnemy.sprite;
 
 updateHealth();
 renderSlots();
 renderCards();
 
-document.getElementById("battle-log").innerHTML="A word crawls from the abyss...";
+document.getElementById("battle-log").innerHTML=
+"A word crawls from the abyss...";
+
 }
+
+/* HEALTH */
 
 function updateHealth(){
 
-var enemyPercent=(enemyHP/currentEnemy.hp)*100;
-document.getElementById("enemy-health").style.width=enemyPercent+"%";
+document.getElementById("enemy-health").style.width=
+(enemyHP/currentEnemy.hp*100)+"%";
 
-var playerPercent=(playerHP/5)*100;
-document.getElementById("player-health").style.width=playerPercent+"%";
+document.getElementById("player-health").style.width=
+(playerHP/5*100)+"%";
 
 }
+
+/* SLOTS */
 
 function renderSlots(){
 
@@ -290,6 +288,8 @@ box.appendChild(d);
 }
 
 }
+
+/* CARDS */
 
 function placeCard(p){
 
@@ -319,7 +319,6 @@ var p=shuffled[i];
 
 var c=document.createElement("div");
 c.className="card";
-
 c.innerHTML=p;
 
 c.onclick=function(){
@@ -332,17 +331,21 @@ box.appendChild(c);
 
 }
 
+/* ENEMY ATTACK */
+
 function enemyAttack(){
 
 playerHP--;
 
-document.getElementById("battle-log").innerHTML="The creature claws at your tongue!";
+document.getElementById("battle-log").innerHTML=
+"The creature claws at your tongue!";
 
 updateHealth();
 
 if(playerHP<=0){
 
-document.getElementById("battle-log").innerHTML="The Forge resets...";
+document.getElementById("battle-log").innerHTML=
+"The Forge resets...";
 
 setTimeout(function(){
 
@@ -354,6 +357,8 @@ loadEnemy();
 }
 
 }
+
+/* VALIDATE */
 
 function validate(){
 
@@ -405,6 +410,9 @@ setTimeout(enemyAttack,700);
 
 }
 
+/* INITIALIZE GAME */
+
+shuffleEnemies();
 loadEnemy();
 
 </script>
