@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AngloForge Combat</title>
+
 <style>
+
 body{
 background:#0a0f18;
 color:white;
@@ -12,25 +14,31 @@ font-family:Arial, sans-serif;
 text-align:center;
 padding:10px;
 }
+
 #battlefield{
 max-width:600px;
 margin:auto;
 }
+
 #enemy-area{
 margin-top:20px;
 }
+
 #enemy-sprite{
 font-size:70px;
 }
+
 #enemy-name{
 font-size:22px;
 color:#ffd36b;
 }
+
 #target-word{
 font-size:28px;
 margin-top:20px;
 margin-bottom:10px;
 }
+
 .hpbar{
 width:220px;
 height:14px;
@@ -38,24 +46,30 @@ background:#222;
 margin:6px auto;
 border:1px solid #555;
 }
+
 .hpfill{
 height:100%;
 background:#e74c3c;
 width:100%;
 }
+
 #player-area{
 margin-top:20px;
 }
+
 #player-sprite{
 font-size:60px;
 }
+
 #player-name{
 font-size:20px;
 color:#66d9ff;
 }
+
 #mora-slots{
 margin-top:25px;
 }
+
 .slot{
 display:inline-block;
 width:55px;
@@ -67,9 +81,11 @@ margin:5px;
 background:#111a28;
 font-family:"DejaVu Sans","Noto Sans",Arial;
 }
+
 #cards{
 margin-top:15px;
 }
+
 .card{
 display:inline-block;
 padding:10px 14px;
@@ -80,9 +96,11 @@ cursor:pointer;
 background:#162233;
 font-family:"DejaVu Sans","Noto Sans",Arial;
 }
+
 .card:hover{
 background:#22354d;
 }
+
 button{
 margin-top:20px;
 padding:12px 30px;
@@ -91,13 +109,38 @@ background:#e74c3c;
 border:none;
 color:white;
 }
+
 #battle-log{
 margin-top:15px;
 min-height:30px;
 color:#ccc;
 }
+
+/* Forge manual button */
+
+.forge-manual{
+display:inline-block;
+margin-top:12px;
+padding:12px 26px;
+background:#162233;
+border:2px solid #4fc3ff;
+color:#7fd8ff;
+font-size:18px;
+text-decoration:none;
+border-radius:6px;
+box-shadow:0 0 8px rgba(79,195,255,0.4);
+transition:all 0.15s ease;
+}
+
+.forge-manual:hover{
+background:#22354d;
+box-shadow:0 0 14px rgba(79,195,255,0.9);
+transform:translateY(-1px);
+}
+
 </style>
 </head>
+
 <body>
 
 <div id="battlefield">
@@ -109,8 +152,10 @@ Defeat the sounds.<br>
 Arrange the phonemes in the correct order and strike.
 </p>
 
-<a href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html" target="_blank">
-<button class="learn-btn">Learn the battle moves here</button>
+<a class="forge-manual"
+href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html"
+target="_blank">
+📜 Learn the battle moves
 </a>
 
 <div id="enemy-area">
