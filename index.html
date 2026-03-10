@@ -29,14 +29,9 @@ font-size:70px;
 }
 
 #enemy-name{
-font-size:22px;
+font-size:26px;
 color:#ffd36b;
-}
-
-#target-word{
-font-size:28px;
-margin-top:20px;
-margin-bottom:10px;
+margin-top:6px;
 }
 
 .hpbar{
@@ -116,8 +111,6 @@ min-height:30px;
 color:#ccc;
 }
 
-/* Forge manual button */
-
 .forge-manual{
 display:inline-block;
 margin-top:12px;
@@ -174,8 +167,6 @@ target="_blank">
 </div>
 </div>
 
-<div id="target-word"></div>
-
 <div id="mora-slots"></div>
 
 <div id="cards"></div>
@@ -229,30 +220,7 @@ var enemies=[
 {name:"Tooth Demon",sprite:"👹",word:"this",phonemes:["ð","ɪ","s"],mora:3,hp:2},
 {name:"Tooth Demon",sprite:"👹",word:"that",phonemes:["ð","æ","t"],mora:3,hp:2},
 {name:"Tooth Demon",sprite:"👹",word:"them",phonemes:["ð","ɛ","m"],mora:3,hp:2},
-{name:"Tooth Demon",sprite:"👹",word:"those",phonemes:["ð","oʊ","z"],mora:3,hp:2},
-
-{name:"Forge Knight",sprite:"⚔️",word:"chair",phonemes:["tʃ","ɛ","r"],mora:3,hp:2},
-{name:"Forge Knight",sprite:"⚔️",word:"cheese",phonemes:["tʃ","iː","z"],mora:3,hp:2},
-{name:"Forge Knight",sprite:"⚔️",word:"jump",phonemes:["dʒ","ʌ","m","p"],mora:4,hp:2},
-{name:"Forge Knight",sprite:"⚔️",word:"joke",phonemes:["dʒ","oʊ","k"],mora:3,hp:2},
-
-{name:"Liquid Spirit",sprite:"🌀",word:"red",phonemes:["r","ɛ","d"],mora:3,hp:2},
-{name:"Liquid Spirit",sprite:"🌀",word:"road",phonemes:["r","oʊ","d"],mora:3,hp:2},
-{name:"Liquid Spirit",sprite:"🌀",word:"light",phonemes:["l","aɪ","t"],mora:3,hp:2},
-{name:"Liquid Spirit",sprite:"🌀",word:"lake",phonemes:["l","eɪ","k"],mora:3,hp:2},
-
-{name:"Glide Phantom",sprite:"🦅",word:"we",phonemes:["w","iː"],mora:2,hp:1},
-{name:"Glide Phantom",sprite:"🦅",word:"win",phonemes:["w","ɪ","n"],mora:3,hp:1},
-{name:"Glide Phantom",sprite:"🦅",word:"yes",phonemes:["j","ɛ","s"],mora:3,hp:1},
-{name:"Glide Phantom",sprite:"🦅",word:"yellow",phonemes:["j","ɛ","l","oʊ"],mora:4,hp:2},
-
-{name:"Flap Assassin",sprite:"🗡",word:"water",phonemes:["w","ɔ","ɾ","ə","r"],mora:5,hp:2},
-{name:"Flap Assassin",sprite:"🗡",word:"better",phonemes:["b","ɛ","ɾ","ə","r"],mora:5,hp:2},
-{name:"Flap Assassin",sprite:"🗡",word:"city",phonemes:["s","ɪ","ɾ","i"],mora:4,hp:2},
-{name:"Flap Assassin",sprite:"🗡",word:"writer",phonemes:["r","aɪ","ɾ","ə","r"],mora:5,hp:2},
-
-{name:"Cluster Titan",sprite:"🗿",word:"strong",phonemes:["s","t","r","ɔ","ŋ"],mora:5,hp:3},
-{name:"Cluster Titan",sprite:"🗿",word:"play",phonemes:["p","l","eɪ"],mora:3,hp:2}
+{name:"Tooth Demon",sprite:"👹",word:"those",phonemes:["ð","oʊ","z"],mora:3,hp:2}
 
 ];
 
@@ -271,19 +239,17 @@ enemyIndex++;
 
 enemyHP=currentEnemy.hp;
 
-document.getElementById("enemy-name").innerHTML=currentEnemy.name;
-
 var w=currentEnemy.word;
 var formatted=w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();
-document.getElementById("target-word").innerHTML=formatted;
 
+document.getElementById("enemy-name").innerHTML=formatted;
 document.getElementById("enemy-sprite").innerHTML=currentEnemy.sprite;
 
 updateHealth();
 renderSlots();
 renderCards();
 
-document.getElementById("battle-log").innerHTML="A wild "+currentEnemy.name+" appears!";
+document.getElementById("battle-log").innerHTML="A wild word appears!";
 }
 
 function updateHealth(){
@@ -330,7 +296,7 @@ box.appendChild(c);
 
 function enemyAttack(){
 playerHP--;
-document.getElementById("battle-log").innerHTML=currentEnemy.name+" strikes back!";
+document.getElementById("battle-log").innerHTML="The word strikes back!";
 updateHealth();
 if(playerHP<=0){
 document.getElementById("battle-log").innerHTML="You were defeated. The Forge resets.";
@@ -341,26 +307,42 @@ setTimeout(function(){playerHP=5;loadEnemy();},1500);
 function validate(){
 var slots=document.getElementsByClassName("slot");
 var correct=true;
+
 for(var i=0;i<currentEnemy.phonemes.length;i++){
-if(slots[i].innerHTML!=currentEnemy.phonemes[i]){correct=false;}
+if(slots[i].innerHTML!=currentEnemy.phonemes[i]){
+correct=false;
 }
+}
+
 if(correct){
 enemyHP--;
 document.getElementById("battle-log").innerHTML="Direct hit!";
 updateHealth();
+
 if(enemyHP<=0){
 document.getElementById("battle-log").innerHTML="Enemy defeated!";
 setTimeout(loadEnemy,1000);
-}else{renderSlots();}
 }else{
-document.getElementById("battle-log").innerHTML="Attack failed.";
-for(var i=0;i<slots.length;i++){slots[i].innerHTML="";}
-setTimeout(enemyAttack,700);
+renderSlots();
 }
+
+}else{
+
+document.getElementById("battle-log").innerHTML="Attack failed.";
+
+for(var i=0;i<slots.length;i++){
+slots[i].innerHTML="";
+}
+
+setTimeout(enemyAttack,700);
+
+}
+
 }
 
 loadEnemy();
 
 </script>
+
 </body>
 </html>
