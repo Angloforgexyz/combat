@@ -98,7 +98,6 @@ border:none;
 color:white;
 }
 
-
 .modebutton{
 background:#162233;
 border:1px solid #4fc3ff;
@@ -135,7 +134,8 @@ Learn the battle moves
 </a>
 </p>
 
-<button class="modebutton" onclick="startEndless()">Endless Arena</button> <button class="modebutton" onclick="startNightmare()">Active Nightmare</button>
+<button class="modebutton" onclick="startEndless()">Endless Arena</button> 
+<button class="modebutton" onclick="startNightmare()">Active Nightmare</button>
 
 <p>Enemies defeated: <span id="score">0</span></p>
 
@@ -351,7 +351,31 @@ body:data
 
 }
 
+function loadLeaderboard(){
+
+fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTW7YErPi0xFWjGmWqftl7cXBPe1AoYhr9t3t_1sBf7tdSXK4eury7Ax6Fij_K058Y3HAcAS0sYPTk8/pub?output=csv")
+.then(r=>r.text())
+.then(text=>{
+
+let rows=text.trim().split("\n").slice(1)
+
+let scores=rows.map(r=>{
+let c=r.split(",")
+return {name:c[1],score:parseInt(c[2])}
+})
+
+scores=scores.sort((a,b)=>b.score-a.score).slice(0,3)
+
+if(scores[0]) document.getElementById("top1").innerText="1. "+scores[0].name+" — "+scores[0].score
+if(scores[1]) document.getElementById("top2").innerText="2. "+scores[1].name+" — "+scores[1].score
+if(scores[2]) document.getElementById("top3").innerText="3. "+scores[2].name+" — "+scores[2].score
+
+})
+
+}
+
 spawnEnemy()
+loadLeaderboard()
 
 </script>
 
