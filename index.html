@@ -70,15 +70,6 @@ margin:4px;
 line-height:50px;
 font-size:22px;
 background:#111a28;
-cursor:pointer;
-}
-
-.bossSlot{
-width:34px;
-height:34px;
-line-height:34px;
-font-size:16px;
-margin:2px;
 }
 
 #cards{
@@ -140,31 +131,8 @@ color:white;
 let playerHP=5
 let enemyHP=3
 let score=0
-
 let lastEnemy=null
-let bossIndex=0
-let isBoss=false
 let playerSequence=[]
-
-const bosses=[
-"She sells seashells by the shore",
-"Peter Piper picked peppers",
-"Red lorry yellow lorry",
-"He thrusts fists against the posts and still insists he sees the ghosts",
-"The sixth sick sheik's sixth sheep's sick",
-"Six slippery snails slid slowly",
-"A tutor who tooted the flute tried to teach two young tooters to toot",
-"Lesser leather never weathered wetter weather better",
-"Imagine an imaginary menagerie manager imagining managing an imaginary menagerie",
-"He thrusts fists against the posts and still insists he sees the ghosts"
-]
-
-const letterIPA={
-a:"æ",b:"b",c:"k",d:"d",e:"ɛ",f:"f",g:"g",h:"h",
-i:"ɪ",j:"dʒ",k:"k",l:"l",m:"m",n:"n",o:"oʊ",
-p:"p",q:"k",r:"r",s:"s",t:"t",u:"ʌ",v:"v",
-w:"w",x:"k",y:"j",z:"z"
-}
 
 const lexicon=[
 {word:"cat",ipa:["k","æ","t"]},
@@ -190,40 +158,6 @@ playerSequence=[]
 document.getElementById("mora-slots").innerHTML=""
 document.getElementById("cards").innerHTML=""
 
-if(score>0 && score%10===0){
-
-isBoss=true
-
-let phrase=bosses[bossIndex%bosses.length]
-bossIndex++
-
-let words=phrase.toLowerCase().replace(/[^a-z\s]/g,"").split(" ")
-
-let ipaSequence=[]
-
-words.forEach(w=>{
-let found=lexicon.find(e=>e.word===w)
-
-if(found){
-ipaSequence=ipaSequence.concat(found.ipa)
-}else{
-w.split("").forEach(l=>{
-ipaSequence.push(letterIPA[l]||l)
-})
-}
-})
-
-currentEnemy={
-word:phrase,
-ipa:ipaSequence
-}
-
-enemyHP=5
-
-}else{
-
-isBoss=false
-
 let enemy
 do{
 enemy=lexicon[Math.floor(Math.random()*lexicon.length)]
@@ -233,8 +167,6 @@ lastEnemy=enemy
 currentEnemy=enemy
 
 enemyHP=Math.ceil(currentEnemy.ipa.length/2)
-
-}
 
 document.getElementById("enemyWord").innerText=currentEnemy.word.toUpperCase()
 
@@ -253,8 +185,6 @@ currentEnemy.ipa.forEach(()=>{
 
 let slot=document.createElement("div")
 slot.className="slot"
-if(isBoss) slot.classList.add("bossSlot")
-
 container.appendChild(slot)
 
 })
@@ -266,11 +196,7 @@ function renderCards(){
 const cardsDiv=document.getElementById("cards")
 cardsDiv.innerHTML=""
 
-let pool=[]
-
-currentEnemy.ipa.forEach(p=>{
-if(!pool.includes(p)) pool.push(p)
-})
+let pool=[...new Set(currentEnemy.ipa)]
 
 let ipaPool=[...new Set(lexicon.flatMap(w=>w.ipa))]
 
@@ -286,6 +212,7 @@ pool.forEach(p=>{
 let card=document.createElement("div")
 card.className="card"
 card.innerText=p
+
 card.onclick=()=>addMora(p)
 
 cardsDiv.appendChild(card)
