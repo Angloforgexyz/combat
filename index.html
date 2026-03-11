@@ -187,6 +187,8 @@ let currentEnemy
 function spawnEnemy(){
 
 playerSequence=[]
+document.getElementById("mora-slots").innerHTML=""
+document.getElementById("cards").innerHTML=""
 
 if(score>0 && score%10===0){
 
@@ -284,7 +286,6 @@ pool.forEach(p=>{
 let card=document.createElement("div")
 card.className="card"
 card.innerText=p
-
 card.onclick=()=>addMora(p)
 
 cardsDiv.appendChild(card)
