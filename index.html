@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
 <meta charset="UTF-8">
@@ -105,8 +104,17 @@ color:white;
 cursor:pointer;
 }
 
-</style>
+.forge-manual{
+display:inline-block;
+margin-top:12px;
+padding:12px 26px;
+background:#162233;
+border:2px solid #4fc3ff;
+color:#7fd8ff;
+text-decoration:none;
+}
 
+</style>
 </head>
 
 <body>
@@ -121,6 +129,18 @@ cursor:pointer;
 </div>
 
 <h2>ANGLOFORGE COMBAT</h2>
+
+<p>
+Test your phonetic might in battle.<br>
+The creatures of the abyss are forged from the sounds of English.<br>
+Arrange the phonemes correctly to strike them down.
+</p>
+
+<a class="forge-manual"
+href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html"
+target="_blank">
+Learn the battle moves
+</a>
 
 <div id="score">
 Enemies defeated: <span id="score-value">0</span>
@@ -149,43 +169,49 @@ Enemies defeated: <span id="score-value">0</span>
 let playerHP=5;
 let enemiesDefeated=0;
 
-const wordBank=[
-"cat","dog","ship","sheep","think","this","stone","storm","plant",
-"dream","flame","glass","train","brain","climb","crime","drift",
-"swift","craft","trust","world","sword","shore","tower","river",
-"singer","danger","dragon","shadow","mirror","horror","terror",
-"wonder","thunder","forest","desert","ocean","valley","abyss",
-"crypt","glyph","cult","void","ritual","eldritch","shoggoth",
-"nameless","madness","cosmic","ancient","forgotten","whisper"
+const lexicon=[
+{word:"cat",ipa:["k","æ","t"]},
+{word:"ship",ipa:["ʃ","ɪ","p"]},
+{word:"sheep",ipa:["ʃ","iː","p"]},
+{word:"dog",ipa:["d","ɔ","g"]},
+{word:"think",ipa:["θ","ɪ","ŋ","k"]},
+{word:"this",ipa:["ð","ɪ","s"]},
+{word:"stone",ipa:["s","t","oʊ","n"]},
+{word:"storm",ipa:["s","t","ɔ","r","m"]},
+{word:"plant",ipa:["p","l","æ","n","t"]},
+{word:"dream",ipa:["d","r","iː","m"]},
+{word:"flame",ipa:["f","l","eɪ","m"]},
+{word:"glass",ipa:["g","l","æ","s"]},
+{word:"train",ipa:["t","r","eɪ","n"]},
+{word:"brain",ipa:["b","r","eɪ","n"]},
+{word:"swift",ipa:["s","w","ɪ","f","t"]},
+{word:"craft",ipa:["k","r","æ","f","t"]},
+{word:"trust",ipa:["t","r","ʌ","s","t"]},
+{word:"world",ipa:["w","ɜ","r","l","d"]},
+{word:"shore",ipa:["ʃ","ɔ","r"]},
+{word:"river",ipa:["r","ɪ","v","ər"]},
+{word:"abyss",ipa:["ə","b","ɪ","s"]},
+{word:"crypt",ipa:["k","r","ɪ","p","t"]},
+{word:"glyph",ipa:["g","l","ɪ","f"]},
+{word:"cult",ipa:["k","ʌ","l","t"]},
+{word:"void",ipa:["v","ɔɪ","d"]},
+{word:"ritual",ipa:["r","ɪ","t","ʃ","u","əl"]},
+{word:"eldritch",ipa:["ɛ","l","d","r","ɪ","t","ʃ"]},
+{word:"shoggoth",ipa:["ʃ","ɒ","g","ə","θ"]},
+{word:"madness",ipa:["m","æ","d","n","ə","s"]},
+{word:"cosmic",ipa:["k","ɒ","z","m","ɪ","k"]}
 ];
-
-let enemies=wordBank.map(word=>{
-
-let phonemes=word.split("");
-
-return{
-name:word,
-phonemes:phonemes,
-mora:phonemes.length,
-hp:Math.max(1,Math.floor(phonemes.length/3))
-};
-
-});
 
 let enemyBag=[];
 let enemyIndex=0;
 
 function shuffleEnemies(){
-
-enemyBag=[...enemies];
-
+enemyBag=[...lexicon];
 for(let i=enemyBag.length-1;i>0;i--){
 let j=Math.floor(Math.random()*(i+1));
 [enemyBag[i],enemyBag[j]]=[enemyBag[j],enemyBag[i]];
 }
-
 enemyIndex=0;
-
 }
 
 let currentEnemy;
@@ -196,9 +222,9 @@ function loadEnemy(){
 if(enemyIndex>=enemyBag.length) shuffleEnemies();
 
 currentEnemy=enemyBag[enemyIndex++];
-enemyHP=currentEnemy.hp;
+enemyHP=Math.max(1,Math.floor(currentEnemy.ipa.length/2));
 
-document.getElementById("enemy-name").innerHTML=currentEnemy.name;
+document.getElementById("enemy-name").innerHTML=currentEnemy.word;
 
 updateHealth();
 renderSlots();
@@ -209,7 +235,7 @@ renderCards();
 function updateHealth(){
 
 document.getElementById("enemy-health").style.width=
-(enemyHP/currentEnemy.hp*100)+"%";
+(enemyHP/(Math.max(1,Math.floor(currentEnemy.ipa.length/2)))*100)+"%";
 
 document.getElementById("player-health").style.width=
 (playerHP/5*100)+"%";
@@ -221,11 +247,10 @@ function renderSlots(){
 let box=document.getElementById("mora-slots");
 box.innerHTML="";
 
-for(let i=0;i<currentEnemy.mora;i++){
+for(let i=0;i<currentEnemy.ipa.length;i++){
 
 let d=document.createElement("div");
 d.className="slot";
-
 d.onclick=function(){this.innerHTML="";};
 
 box.appendChild(d);
@@ -252,7 +277,7 @@ function renderCards(){
 let box=document.getElementById("cards");
 box.innerHTML="";
 
-let shuffled=[...currentEnemy.phonemes].sort(()=>Math.random()-0.5);
+let shuffled=[...currentEnemy.ipa].sort(()=>Math.random()-0.5);
 
 shuffled.forEach(p=>{
 
@@ -318,8 +343,8 @@ function validate(){
 let slots=document.getElementsByClassName("slot");
 let correct=true;
 
-for(let i=0;i<currentEnemy.phonemes.length;i++){
-if(slots[i].innerHTML!=currentEnemy.phonemes[i]) correct=false;
+for(let i=0;i<currentEnemy.ipa.length;i++){
+if(slots[i].innerHTML!=currentEnemy.ipa[i]) correct=false;
 }
 
 if(correct){
