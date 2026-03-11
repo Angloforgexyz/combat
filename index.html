@@ -163,12 +163,8 @@ Enemies defeated: <span id="score-value">0</span>
 
 <script>
 
-/* PLAYER */
-
 let playerHP = 5;
 let enemiesDefeated = 0;
-
-/* WORD BANK */
 
 const wordBank = [
 
@@ -190,8 +186,6 @@ const wordBank = [
 
 ];
 
-/* ENEMY CREATION */
-
 let enemies = wordBank.map(word => {
 
 let phonemes = word.split("");
@@ -204,8 +198,6 @@ hp: Math.max(1,Math.floor(phonemes.length/3))
 };
 
 });
-
-/* SHUFFLE BAG */
 
 let enemyBag=[];
 let enemyIndex=0;
@@ -226,8 +218,6 @@ enemyIndex=0;
 let currentEnemy;
 let enemyHP;
 
-/* LOAD ENEMY */
-
 function loadEnemy(){
 
 if(enemyIndex>=enemyBag.length){
@@ -247,8 +237,6 @@ renderCards();
 
 }
 
-/* HEALTH */
-
 function updateHealth(){
 
 document.getElementById("enemy-health").style.width =
@@ -258,8 +246,6 @@ document.getElementById("player-health").style.width =
 (playerHP/5*100)+"%";
 
 }
-
-/* SLOTS */
 
 function renderSlots(){
 
@@ -280,8 +266,6 @@ box.appendChild(d);
 }
 
 }
-
-/* CARDS */
 
 function placeCard(p){
 
@@ -319,8 +303,6 @@ box.appendChild(c);
 
 }
 
-/* ENEMY ATTACK */
-
 function enemyAttack(){
 
 playerHP--;
@@ -341,8 +323,6 @@ loadEnemy();
 }
 
 }
-
-/* VALIDATION */
 
 function validate(){
 
@@ -383,8 +363,6 @@ setTimeout(enemyAttack,500);
 
 }
 
-/* SCORE SUBMISSION */
-
 function submitScore(){
 
 let playerName = prompt("Enter your name for the Forge leaderboard:");
@@ -395,10 +373,8 @@ let formURL = "https://docs.google.com/forms/d/e/1FAIpQLSftQRRykk_Uwrv0qw9w2VlaK
 
 let formData = new FormData();
 
-/* THESE TWO LINES NEED REAL ENTRY IDs */
-
-formData.append("entry.0000000000", playerName);
-formData.append("entry.1111111111", enemiesDefeated);
+formData.append("entry.860941965", playerName);
+formData.append("entry.923184678", enemiesDefeated);
 
 fetch(formURL,{
 method:"POST",
@@ -406,11 +382,9 @@ mode:"no-cors",
 body:formData
 });
 
-alert("Score submitted!");
+alert("Score submitted to the Forge!");
 
 }
-
-/* START */
 
 shuffleEnemies();
 loadEnemy();
