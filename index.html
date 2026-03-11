@@ -1,62 +1,40 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AngloForge Combat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 
 body{
 background:#0a0f18;
 color:white;
-font-family:Arial,sans-serif;
+font-family:Arial, sans-serif;
 text-align:center;
-padding:10px;
-}
-
-#battlefield{
-max-width:600px;
-margin:auto;
+margin:0;
+padding:20px;
 }
 
 #leaderboard{
-margin-bottom:20px;
-padding:10px;
-background:#111a28;
 border:1px solid #4fc3ff;
+padding:10px;
+margin-bottom:20px;
+background:#111a28;
 }
 
 #leaderboard h3{
+color:#ffd36b;
 margin:5px 0;
-color:#ffd36b;
-}
-
-.mode-button{
-margin:6px;
-padding:8px 16px;
-background:#162233;
-border:1px solid #4fc3ff;
-color:white;
-cursor:pointer;
-}
-
-#enemy-sprite{
-font-size:70px;
-}
-
-#enemy-name{
-font-size:26px;
-color:#ffd36b;
-margin-top:6px;
 }
 
 .hpbar{
-width:220px;
-height:14px;
-background:#222;
-margin:6px auto;
-border:1px solid #555;
+width:200px;
+height:12px;
+background:#333;
+margin:auto;
+margin-top:5px;
 }
 
 .hpfill{
@@ -65,62 +43,70 @@ background:#e74c3c;
 width:100%;
 }
 
+#enemy-sprite{
+font-size:60px;
+margin-top:10px;
+}
+
+#player-sprite{
+font-size:50px;
+}
+
 #mora-slots{
 margin-top:25px;
 }
 
 .slot{
 display:inline-block;
-width:55px;
-height:55px;
+width:50px;
+height:50px;
 border:2px solid #4fc3ff;
-line-height:55px;
+margin:4px;
+line-height:50px;
 font-size:22px;
-margin:5px;
 background:#111a28;
 cursor:pointer;
 }
 
 #cards{
-margin-top:15px;
+margin-top:20px;
 }
 
 .card{
 display:inline-block;
 padding:10px 14px;
-border:1px solid #4fc3ff;
 margin:5px;
+border:1px solid #4fc3ff;
+background:#162233;
 font-size:22px;
 cursor:pointer;
-background:#162233;
 }
 
 button{
+padding:12px 25px;
 margin-top:15px;
-padding:12px 30px;
 font-size:18px;
+cursor:pointer;
 background:#e74c3c;
 border:none;
 color:white;
-cursor:pointer;
 }
 
-.forge-manual{
-display:inline-block;
-margin-top:12px;
-padding:12px 26px;
+.modebutton{
 background:#162233;
-border:2px solid #4fc3ff;
+border:1px solid #4fc3ff;
+margin:5px;
+}
+
+a{
 color:#7fd8ff;
-text-decoration:none;
 }
 
 </style>
+
 </head>
 
 <body>
-
-<div id="battlefield">
 
 <div id="leaderboard">
 <h3>🏆 Forge Champions</h3>
@@ -136,72 +122,36 @@ Test your phonetic might in battle.<br>
 The creatures of the abyss are forged from the sounds of English.
 </p>
 
-<a class="forge-manual"
-href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html"
-target="_blank">
+<p>
+<a href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html" target="_blank">
 Learn the battle moves
 </a>
+</p>
 
-<br><br>
+<button class="modebutton" onclick="startEndless()">Endless Arena</button> <button class="modebutton" onclick="startNightmare()">Active Nightmare</button>
 
-<button class="mode-button" onclick="setMode('endless')">Endless Arena</button>
-<button class="mode-button" onclick="setMode('daily')">Active Nightmare</button>
+<p>Enemies defeated: <span id="score">0</span></p>
 
-<div id="score">
-Enemies defeated: <span id="score-value">0</span>
-</div>
-
-<div id="enemy-area">
 <div id="enemy-sprite">👹</div>
-<div id="enemy-name"></div>
-<div class="hpbar"><div id="enemy-health" class="hpfill"></div></div>
-</div>
 
-<div id="player-area">
+<div class="hpbar"><div id="enemyHP" class="hpfill"></div></div>
+
 <div id="player-sprite">🛡</div>
-<div class="hpbar"><div id="player-health" class="hpfill"></div></div>
-</div>
+
+<div class="hpbar"><div id="playerHP" class="hpfill"></div></div>
 
 <div id="mora-slots"></div>
+
 <div id="cards"></div>
 
-<button onclick="validate()">ATTACK</button>
-
-</div>
+<button onclick="attack()">ATTACK</button>
 
 <script>
 
 let playerHP=5
-let enemiesDefeated=0
-let gameMode="endless"
-
-const leaderboardURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTW7YErPi0xFWjGmWqftl7cXBPe1AoYhr9t3t_1sBf7tdSXK4eury7Ax6Fij_K058Y3HAcAS0sYPTk8/pub?output=csv"
-
-function loadLeaderboard(){
-
-fetch(leaderboardURL)
-.then(res=>res.text())
-.then(data=>{
-
-let rows=data.split("\n").slice(1)
-
-let scores=rows.map(r=>{
-let c=r.split(",")
-return{
-name:c[1],
-score:parseInt(c[2])
-}
-}).filter(x=>x.name && !isNaN(x.score))
-
-scores.sort((a,b)=>b.score-a.score)
-
-if(scores[0]) document.getElementById("top1").innerHTML="1. "+scores[0].name+" — "+scores[0].score
-if(scores[1]) document.getElementById("top2").innerHTML="2. "+scores[1].name+" — "+scores[1].score
-if(scores[2]) document.getElementById("top3").innerHTML="3. "+scores[2].name+" — "+scores[2].score
-
-})
-
-}
+let enemyHP=3
+let score=0
+let nightmareMode=false
 
 const lexicon=[
 {word:"cat",ipa:["k","æ","t"]},
@@ -219,108 +169,53 @@ const lexicon=[
 {word:"cosmic",ipa:["k","ɒ","z","m","ɪ","k"]}
 ]
 
-function getDailyWord(){
-
-let today=new Date()
-let seed=today.getFullYear()*1000+today.getMonth()*50+today.getDate()
-
-let index=seed % lexicon.length
-
-return lexicon[index]
-
-}
-
-let enemyBag=[]
-let enemyIndex=0
 let currentEnemy
-let enemyHP
 
-function setMode(mode){
-
-gameMode=mode
-
-shuffleEnemies()
-loadEnemy()
-
+function dailyIndex(){
+const d=new Date()
+return (d.getFullYear()+d.getMonth()+d.getDate())%lexicon.length
 }
 
-function shuffleEnemies(){
-
-enemyBag=[...lexicon]
-
-for(let i=enemyBag.length-1;i>0;i--){
-let j=Math.floor(Math.random()*(i+1))
-[enemyBag[i],enemyBag[j]]=[enemyBag[j],enemyBag[i]]
+function randomEnemy(){
+return lexicon[Math.floor(Math.random()*lexicon.length)]
 }
 
-enemyIndex=0
+function spawnEnemy(){
 
-}
-
-function loadEnemy(){
-
-if(gameMode==="daily"){
-
-currentEnemy=getDailyWord()
-
+if(nightmareMode){
+currentEnemy=lexicon[dailyIndex()]
 }else{
-
-if(enemyIndex>=enemyBag.length) shuffleEnemies()
-
-currentEnemy=enemyBag[enemyIndex++]
-
+currentEnemy=randomEnemy()
 }
 
-enemyHP=Math.max(1,Math.floor(currentEnemy.ipa.length/2))
+enemyHP=Math.ceil(currentEnemy.ipa.length/2)
 
-document.getElementById("enemy-name").innerHTML=currentEnemy.word
-
-updateHealth()
 renderSlots()
 renderCards()
-
-}
-
-function updateHealth(){
-
-document.getElementById("enemy-health").style.width=(enemyHP/3*100)+"%"
-document.getElementById("player-health").style.width=(playerHP/5*100)+"%"
+updateBars()
 
 }
 
 function renderSlots(){
 
-let box=document.getElementById("mora-slots")
+const box=document.getElementById("mora-slots")
 box.innerHTML=""
 
-for(let i=0;i<currentEnemy.ipa.length;i++){
+currentEnemy.ipa.forEach(()=>{
 
-let d=document.createElement("div")
-d.className="slot"
-d.onclick=function(){this.innerHTML=""}
+let s=document.createElement("div")
+s.className="slot"
+s.onclick=function(){s.innerHTML=""}
 
-box.appendChild(d)
+box.appendChild(s)
 
-}
-
-}
-
-function placeCard(p){
-
-let slots=document.getElementsByClassName("slot")
-
-for(let i=0;i<slots.length;i++){
-if(slots[i].innerHTML===""){
-slots[i].innerHTML=p
-return
-}
-}
+})
 
 }
 
 function renderCards(){
 
-let box=document.getElementById("cards")
+const box=document.getElementById("cards")
 box.innerHTML=""
 
 let shuffled=[...currentEnemy.ipa].sort(()=>Math.random()-0.5)
@@ -339,20 +234,106 @@ box.appendChild(c)
 
 }
 
-function submitScore(score){
+function placeCard(p){
+
+let slots=document.querySelectorAll(".slot")
+
+for(let s of slots){
+
+if(s.innerHTML===""){
+s.innerHTML=p
+return
+}
+
+}
+
+}
+
+function attack(){
+
+let slots=document.querySelectorAll(".slot")
+
+for(let i=0;i<currentEnemy.ipa.length;i++){
+
+if(slots[i].innerHTML!==currentEnemy.ipa[i]){
+
+enemyTurn()
+return
+
+}
+
+}
+
+enemyHP--
+
+if(enemyHP<=0){
+
+score++
+document.getElementById("score").innerText=score
+spawnEnemy()
+
+}else{
+
+renderSlots()
+
+}
+
+updateBars()
+
+}
+
+function enemyTurn(){
+
+playerHP--
+
+if(playerHP<=0){
+
+submitScore()
+alert("Defeated. Score: "+score)
+
+playerHP=5
+score=0
+document.getElementById("score").innerText=0
+
+}
+
+updateBars()
+
+}
+
+function updateBars(){
+
+document.getElementById("enemyHP").style.width=(enemyHP/5*100)+"%"
+document.getElementById("playerHP").style.width=(playerHP/5*100)+"%"
+
+}
+
+function startEndless(){
+
+nightmareMode=false
+spawnEnemy()
+
+}
+
+function startNightmare(){
+
+nightmareMode=true
+spawnEnemy()
+
+}
+
+function submitScore(){
 
 let name=prompt("Forge Champion name:")
 
 if(!name) return
-
-let formURL="https://docs.google.com/forms/d/e/1FAIpQLSftQRRykk_Uwrv0qw9w2VlaKy6aKWO9u4VJZib3izXuPjJoNQ/formResponse"
 
 let data=new FormData()
 
 data.append("entry.860941965",name)
 data.append("entry.923184678",score)
 
-fetch(formURL,{
+fetch("https://docs.google.com/forms/d/e/1FAIpQLSftQRRykk_Uwrv0qw9w2VlaKy6aKWO9u4VJZib3izXuPjJoNQ/formResponse",{
 method:"POST",
 mode:"no-cors",
 body:data
@@ -360,69 +341,7 @@ body:data
 
 }
 
-function enemyAttack(){
-
-playerHP--
-
-updateHealth()
-
-if(playerHP<=0){
-
-submitScore(enemiesDefeated)
-
-alert("Defeated. Score: "+enemiesDefeated)
-
-playerHP=5
-enemiesDefeated=0
-
-document.getElementById("score-value").innerHTML=0
-
-shuffleEnemies()
-loadEnemy()
-
-}
-
-}
-
-function validate(){
-
-let slots=document.getElementsByClassName("slot")
-let correct=true
-
-for(let i=0;i<currentEnemy.ipa.length;i++){
-if(slots[i].innerHTML!=currentEnemy.ipa[i]) correct=false
-}
-
-if(correct){
-
-enemyHP--
-
-updateHealth()
-
-if(enemyHP<=0){
-
-enemiesDefeated++
-document.getElementById("score-value").innerHTML=enemiesDefeated
-
-setTimeout(loadEnemy,700)
-
-}else{
-renderSlots()
-}
-
-}else{
-
-for(let s of slots) s.innerHTML=""
-
-setTimeout(enemyAttack,500)
-
-}
-
-}
-
-shuffleEnemies()
-loadEnemy()
-loadLeaderboard()
+spawnEnemy()
 
 </script>
 
