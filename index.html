@@ -304,6 +304,10 @@ words.forEach(w=>{
 let found=lexicon.find(e=>e.word===w)
 if(found){
 ipaSequence=ipaSequence.concat(found.ipa)
+}else{
+w.split("").forEach(l=>{
+ipaSequence.push(l)
+})
 }
 })
 
