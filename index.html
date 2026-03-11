@@ -158,6 +158,21 @@ let enemyHP=3
 let score=0
 
 let lastEnemy=null
+let bossIndex=0
+let isBoss=false
+
+const bosses=[
+"She sells seashells by the shore",
+"Peter Piper picked peppers",
+"Red lorry yellow lorry",
+"He thrusts fists against the posts and still insists he sees the ghosts",
+"The sixth sick sheik's sixth sheep's sick",
+"Six slippery snails slid slowly",
+"A tutor who tooted the flute tried to teach two young tooters to toot",
+"Lesser leather never weathered wetter weather better",
+"Imagine an imaginary menagerie manager imagining managing an imaginary menagerie",
+"He thrusts fists against the posts and still insists he sees the ghosts"
+]
 
 const lexicon=[
 {word:"cat",ipa:["k","æ","t"]},
@@ -264,7 +279,28 @@ const lexicon=[
 
 let currentEnemy
 
-function randomEnemy(){
+function spawnEnemy(){
+
+if(score>0 && score%10===0){
+
+isBoss=true
+
+let phrase=bosses[bossIndex%bosses.length]
+
+bossIndex++
+
+let letters=phrase.toLowerCase().replace(/[^a-z]/g,"").split("")
+
+currentEnemy={
+word:phrase,
+ipa:letters
+}
+
+enemyHP=5
+
+}else{
+
+isBoss=false
 
 let enemy
 
@@ -273,17 +309,13 @@ enemy=lexicon[Math.floor(Math.random()*lexicon.length)]
 }while(enemy===lastEnemy)
 
 lastEnemy=enemy
-return enemy
+currentEnemy=enemy
+
+enemyHP=Math.ceil(currentEnemy.ipa.length/2)
 
 }
 
-function spawnEnemy(){
-
-currentEnemy=randomEnemy()
-
 document.getElementById("enemyWord").innerText=currentEnemy.word.toUpperCase()
-
-enemyHP=Math.ceil(currentEnemy.ipa.length/2)
 
 renderSlots()
 renderCards()
