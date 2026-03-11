@@ -443,7 +443,7 @@ let rows=text.trim().split("\n").slice(1)
 let scores=rows.map(r=>{
 let c=r.split(",")
 return {name:c[1],score:parseInt(c[2])}
-})
+}).filter(s=>!isNaN(s.score))
 
 scores=scores.sort((a,b)=>b.score-a.score).slice(0,3)
 
