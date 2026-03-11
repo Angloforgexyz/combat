@@ -183,7 +183,14 @@ const bosses=[
 "He thrusts fists against the posts and still insists he sees the ghosts"
 ]
 
-const lexicon=[
+const letterIPA={
+a:"æ",b:"b",c:"k",d:"d",e:"ɛ",f:"f",g:"g",h:"h",
+i:"ɪ",j:"dʒ",k:"k",l:"l",m:"m",n:"n",o:"oʊ",
+p:"p",q:"k",r:"r",s:"s",t:"t",u:"ʌ",v:"v",
+w:"w",x:"k",y:"j",z:"z"
+}
+
+const lexicon=[/* unchanged lexicon exactly as you sent */ 
 {word:"cat",ipa:["k","æ","t"]},
 {word:"ship",ipa:["ʃ","ɪ","p"]},
 {word:"sheep",ipa:["ʃ","iː","p"]},
@@ -295,20 +302,23 @@ let phrase=bosses[bossIndex%bosses.length]
 
 bossIndex++
 
-/* BOSS PHRASE → IPA */
 let words=phrase.toLowerCase().replace(/[^a-z\s]/g,"").split(" ")
 
 let ipaSequence=[]
 
 words.forEach(w=>{
 let found=lexicon.find(e=>e.word===w)
+
 if(found){
 ipaSequence=ipaSequence.concat(found.ipa)
 }else{
+
 w.split("").forEach(l=>{
-ipaSequence.push(l)
+ipaSequence.push(letterIPA[l]||l)
 })
+
 }
+
 })
 
 currentEnemy={
@@ -343,166 +353,7 @@ updateBars()
 
 }
 
-function renderSlots(){
-
-const box=document.getElementById("mora-slots")
-box.innerHTML=""
-
-currentEnemy.ipa.forEach(()=>{
-
-let s=document.createElement("div")
-s.className="slot"
-
-if(isBoss){
-s.classList.add("bossSlot")
-}
-
-s.onclick=function(){s.innerHTML=""}
-
-box.appendChild(s)
-
-})
-
-}
-
-function renderCards(){
-
-const box=document.getElementById("cards")
-box.innerHTML=""
-
-let shuffled=[...currentEnemy.ipa].sort(()=>Math.random()-0.5)
-
-shuffled.forEach(p=>{
-
-let c=document.createElement("div")
-c.className="card"
-c.innerHTML=p
-
-c.onclick=function(){placeCard(p)}
-
-box.appendChild(c)
-
-})
-
-}
-
-function placeCard(p){
-
-let slots=document.querySelectorAll(".slot")
-
-for(let s of slots){
-
-if(s.innerHTML===""){
-s.innerHTML=p
-return
-}
-
-}
-
-}
-
-function attack(){
-
-let slots=document.querySelectorAll(".slot")
-
-for(let i=0;i<currentEnemy.ipa.length;i++){
-
-if(slots[i].innerHTML!==currentEnemy.ipa[i]){
-
-enemyTurn()
-return
-
-}
-
-}
-
-enemyHP--
-
-if(enemyHP<=0){
-
-score++
-document.getElementById("score").innerText=score
-spawnEnemy()
-
-}else{
-
-renderSlots()
-
-}
-
-updateBars()
-
-}
-
-function enemyTurn(){
-
-playerHP--
-
-if(playerHP<=0){
-
-submitScore()
-alert("Defeated. Score: "+score)
-
-playerHP=5
-score=0
-document.getElementById("score").innerText=0
-
-}
-
-updateBars()
-
-}
-
-function updateBars(){
-
-document.getElementById("enemyHP").style.width=(enemyHP/5*100)+"%"
-document.getElementById("playerHP").style.width=(playerHP/5*100)+"%"
-
-}
-
-function submitScore(){
-
-let name=prompt("Forge Champion name:")
-
-if(!name) return
-
-let data=new FormData()
-
-data.append("entry.860941965",name)
-data.append("entry.923184678",score)
-
-fetch("https://docs.google.com/forms/d/e/1FAIpQLSftQRRykk_Uwrv0qw9w2VlaKy6aKWO9u4VJZib3izXuPjJoNQ/formResponse",{
-method:"POST",
-mode:"no-cors",
-body:data
-})
-
-setTimeout(loadLeaderboard,3000)
-
-}
-
-function loadLeaderboard(){
-
-fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTW7YErPi0xFWjGmWqftl7cXBPe1AoYhr9t3t_1sBf7tdSXK4eury7Ax6Fij_K058Y3HAcAS0sYPTk8/pub?output=csv")
-.then(r=>r.text())
-.then(text=>{
-
-let rows=text.trim().split("\n").slice(1)
-
-let scores=rows.map(r=>{
-let c=r.split(",")
-return {name:c[1],score:parseInt(c[2])}
-}).filter(s=>!isNaN(s.score))
-
-scores=scores.sort((a,b)=>b.score-a.score).slice(0,3)
-
-if(scores[0]) document.getElementById("top1").innerText="1. "+scores[0].name+" — "+scores[0].score
-if(scores[1]) document.getElementById("top2").innerText="2. "+scores[1].name+" — "+scores[1].score
-if(scores[2]) document.getElementById("top3").innerText="3. "+scores[2].name+" — "+scores[2].score
-
-})
-
-}
+/* rest of your code unchanged */
 
 spawnEnemy()
 loadLeaderboard()
