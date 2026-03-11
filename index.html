@@ -29,6 +29,12 @@ color:#ffd36b;
 margin:5px 0;
 }
 
+#enemyWord{
+font-size:26px;
+color:#ffd36b;
+margin-top:10px;
+}
+
 .hpbar{
 width:200px;
 height:12px;
@@ -133,6 +139,7 @@ Learn the battle moves
 <p>Enemies defeated: <span id="score">0</span></p>
 
 <div id="enemy-sprite">👹</div>
+<div id="enemyWord"></div>
 
 <div class="hpbar"><div id="enemyHP" class="hpfill"></div></div>
 
@@ -187,6 +194,8 @@ currentEnemy=lexicon[dailyIndex()]
 }else{
 currentEnemy=randomEnemy()
 }
+
+document.getElementById("enemyWord").innerText=currentEnemy.word.toUpperCase()
 
 enemyHP=Math.ceil(currentEnemy.ipa.length/2)
 
