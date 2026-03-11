@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -74,7 +73,6 @@ background:#111a28;
 cursor:pointer;
 }
 
-/* BOSS SWARM MODE */
 .bossSlot{
 width:34px;
 height:34px;
@@ -107,18 +105,7 @@ border:none;
 color:white;
 }
 
-.modebutton{
-background:#162233;
-border:1px solid #4fc3ff;
-margin:5px;
-}
-
-a{
-color:#7fd8ff;
-}
-
 </style>
-
 </head>
 
 <body>
@@ -132,17 +119,6 @@ color:#7fd8ff;
 
 <h2>ANGLOFORGE COMBAT</h2>
 
-<p>
-Test your phonetic might in battle.<br>
-The creatures of the abyss are forged from the sounds of English.
-</p>
-
-<p>
-<a href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html" target="_blank">
-Learn the battle moves
-</a>
-</p>
-
 <p>Enemies defeated: <span id="score">0</span></p>
 
 <div id="enemy-sprite">👹</div>
@@ -155,7 +131,6 @@ Learn the battle moves
 <div class="hpbar"><div id="playerHP" class="hpfill"></div></div>
 
 <div id="mora-slots"></div>
-
 <div id="cards"></div>
 
 <button onclick="attack()">ATTACK</button>
@@ -169,6 +144,7 @@ let score=0
 let lastEnemy=null
 let bossIndex=0
 let isBoss=false
+let playerSequence=[]
 
 const bosses=[
 "She sells seashells by the shore",
@@ -190,7 +166,7 @@ p:"p",q:"k",r:"r",s:"s",t:"t",u:"ʌ",v:"v",
 w:"w",x:"k",y:"j",z:"z"
 }
 
-const lexicon=[/* unchanged lexicon exactly as you sent */ 
+const lexicon=[
 {word:"cat",ipa:["k","æ","t"]},
 {word:"ship",ipa:["ʃ","ɪ","p"]},
 {word:"sheep",ipa:["ʃ","iː","p"]},
@@ -203,103 +179,20 @@ const lexicon=[/* unchanged lexicon exactly as you sent */
 {word:"ritual",ipa:["r","ɪ","t","ʃ","u","əl"]},
 {word:"eldritch",ipa:["ɛ","l","d","r","ɪ","t","ʃ"]},
 {word:"shoggoth",ipa:["ʃ","ɒ","g","ə","θ"]},
-{word:"cosmic",ipa:["k","ɒ","z","m","ɪ","k"]},
-{word:"dog",ipa:["d","ɔ","g"]},
-{word:"bed",ipa:["b","ɛ","d"]},
-{word:"cup",ipa:["k","ʌ","p"]},
-{word:"sun",ipa:["s","ʌ","n"]},
-{word:"moon",ipa:["m","uː","n"]},
-{word:"star",ipa:["s","t","ɑ","r"]},
-{word:"light",ipa:["l","aɪ","t"]},
-{word:"dark",ipa:["d","ɑ","r","k"]},
-{word:"fire",ipa:["f","aɪ","ər"]},
-{word:"water",ipa:["w","ɔ","t","ər"]},
-{word:"earth",ipa:["ɜ","r","θ"]},
-{word:"wind",ipa:["w","ɪ","n","d"]},
-{word:"sky",ipa:["s","k","aɪ"]},
-{word:"cloud",ipa:["k","l","aʊ","d"]},
-{word:"rain",ipa:["r","eɪ","n"]},
-{word:"snow",ipa:["s","n","oʊ"]},
-{word:"ice",ipa:["aɪ","s"]},
-{word:"metal",ipa:["m","ɛ","t","əl"]},
-{word:"blade",ipa:["b","l","eɪ","d"]},
-{word:"shield",ipa:["ʃ","iː","l","d"]},
-{word:"armor",ipa:["ɑ","r","m","ər"]},
-{word:"sword",ipa:["s","ɔ","r","d"]},
-{word:"arrow",ipa:["æ","r","oʊ"]},
-{word:"bow",ipa:["b","oʊ"]},
-{word:"hunt",ipa:["h","ʌ","n","t"]},
-{word:"track",ipa:["t","r","æ","k"]},
-{word:"beast",ipa:["b","iː","s","t"]},
-{word:"wolf",ipa:["w","ʊ","l","f"]},
-{word:"crow",ipa:["k","r","oʊ"]},
-{word:"snake",ipa:["s","n","eɪ","k"]},
-{word:"fang",ipa:["f","æ","ŋ"]},
-{word:"claw",ipa:["k","l","ɔ"]},
-{word:"bone",ipa:["b","oʊ","n"]},
-{word:"blood",ipa:["b","l","ʌ","d"]},
-{word:"flesh",ipa:["f","l","ɛ","ʃ"]},
-{word:"grave",ipa:["g","r","eɪ","v"]},
-{word:"crypt",ipa:["k","r","ɪ","p","t"]},
-{word:"ghost",ipa:["g","oʊ","s","t"]},
-{word:"spirit",ipa:["s","p","ɪ","r","ɪ","t"]},
-{word:"shadow",ipa:["ʃ","æ","d","oʊ"]},
-{word:"night",ipa:["n","aɪ","t"]},
-{word:"dawn",ipa:["d","ɔ","n"]},
-{word:"dusk",ipa:["d","ʌ","s","k"]},
-{word:"ember",ipa:["ɛ","m","b","ər"]},
-{word:"ash",ipa:["æ","ʃ"]},
-{word:"smoke",ipa:["s","m","oʊ","k"]},
-{word:"flame",ipa:["f","l","eɪ","m"]},
-{word:"spark",ipa:["s","p","ɑ","r","k"]},
-{word:"pulse",ipa:["p","ʌ","l","s"]},
-{word:"heart",ipa:["h","ɑ","r","t"]},
-{word:"mind",ipa:["m","aɪ","n","d"]},
-{word:"thought",ipa:["θ","ɔ","t"]},
-{word:"sleep",ipa:["s","l","iː","p"]},
-{word:"wake",ipa:["w","eɪ","k"]},
-{word:"walk",ipa:["w","ɔ","k"]},
-{word:"run",ipa:["r","ʌ","n"]},
-{word:"jump",ipa:["dʒ","ʌ","m","p"]},
-{word:"fall",ipa:["f","ɔ","l"]},
-{word:"rise",ipa:["r","aɪ","z"]},
-{word:"build",ipa:["b","ɪ","l","d"]},
-{word:"break",ipa:["b","r","eɪ","k"]},
-{word:"craft",ipa:["k","r","æ","f","t"]},
-{word:"forge",ipa:["f","ɔ","r","dʒ"]},
-{word:"shape",ipa:["ʃ","eɪ","p"]},
-{word:"form",ipa:["f","ɔ","r","m"]},
-{word:"power",ipa:["p","aʊ","ər"]},
-{word:"force",ipa:["f","ɔ","r","s"]},
-{word:"energy",ipa:["ɛ","n","ər","dʒ","i"]},
-{word:"signal",ipa:["s","ɪ","g","n","əl"]},
-{word:"sound",ipa:["s","aʊ","n","d"]},
-{word:"voice",ipa:["v","ɔɪ","s"]},
-{word:"word",ipa:["w","ɜ","r","d"]},
-{word:"phrase",ipa:["f","r","eɪ","z"]},
-{word:"speech",ipa:["s","p","iː","tʃ"]},
-{word:"echo",ipa:["ɛ","k","oʊ"]},
-{word:"cipher",ipa:["s","aɪ","f","ər"]},
-{word:"symbol",ipa:["s","ɪ","m","b","əl"]},
-{word:"rune",ipa:["r","uː","n"]},
-{word:"glyph",ipa:["g","l","ɪ","f"]},
-{word:"mark",ipa:["m","ɑ","r","k"]},
-{word:"trace",ipa:["t","r","eɪ","s"]},
-{word:"path",ipa:["p","æ","θ"]},
-{word:"gate",ipa:["g","eɪ","t"]},
-{word:"portal",ipa:["p","ɔ","r","t","əl"]}
+{word:"cosmic",ipa:["k","ɒ","z","m","ɪ","k"]}
 ]
 
 let currentEnemy
 
 function spawnEnemy(){
 
+playerSequence=[]
+
 if(score>0 && score%10===0){
 
 isBoss=true
 
 let phrase=bosses[bossIndex%bosses.length]
-
 bossIndex++
 
 let words=phrase.toLowerCase().replace(/[^a-z\s]/g,"").split(" ")
@@ -312,13 +205,10 @@ let found=lexicon.find(e=>e.word===w)
 if(found){
 ipaSequence=ipaSequence.concat(found.ipa)
 }else{
-
 w.split("").forEach(l=>{
 ipaSequence.push(letterIPA[l]||l)
 })
-
 }
-
 })
 
 currentEnemy={
@@ -333,7 +223,6 @@ enemyHP=5
 isBoss=false
 
 let enemy
-
 do{
 enemy=lexicon[Math.floor(Math.random()*lexicon.length)]
 }while(enemy===lastEnemy)
@@ -353,7 +242,105 @@ updateBars()
 
 }
 
-/* rest of your code unchanged */
+function renderSlots(){
+
+const container=document.getElementById("mora-slots")
+container.innerHTML=""
+
+currentEnemy.ipa.forEach(()=>{
+
+let slot=document.createElement("div")
+slot.className="slot"
+if(isBoss) slot.classList.add("bossSlot")
+
+container.appendChild(slot)
+
+})
+
+}
+
+function renderCards(){
+
+const cardsDiv=document.getElementById("cards")
+cardsDiv.innerHTML=""
+
+let pool=[]
+
+currentEnemy.ipa.forEach(p=>{
+if(!pool.includes(p)) pool.push(p)
+})
+
+let ipaPool=[...new Set(lexicon.flatMap(w=>w.ipa))]
+
+while(pool.length<10){
+let r=ipaPool[Math.floor(Math.random()*ipaPool.length)]
+if(!pool.includes(r)) pool.push(r)
+}
+
+pool.sort(()=>Math.random()-0.5)
+
+pool.forEach(p=>{
+
+let card=document.createElement("div")
+card.className="card"
+card.innerText=p
+
+card.onclick=()=>addMora(p)
+
+cardsDiv.appendChild(card)
+
+})
+
+}
+
+function addMora(p){
+
+if(playerSequence.length>=currentEnemy.ipa.length) return
+
+playerSequence.push(p)
+
+let slots=document.querySelectorAll(".slot")
+slots[playerSequence.length-1].innerText=p
+
+}
+
+function attack(){
+
+if(playerSequence.join("")===currentEnemy.ipa.join("")){
+
+score++
+document.getElementById("score").innerText=score
+spawnEnemy()
+
+}else{
+
+playerHP--
+
+if(playerHP<=0){
+alert("You were devoured by phonemes.")
+location.reload()
+}
+
+updateBars()
+
+}
+
+}
+
+function updateBars(){
+
+document.getElementById("playerHP").style.width=(playerHP*20)+"%"
+document.getElementById("enemyHP").style.width=(enemyHP*20)+"%"
+
+}
+
+function loadLeaderboard(){
+
+document.getElementById("top1").innerText="1. player — 0"
+document.getElementById("top2").innerText="2. challenger — 0"
+document.getElementById("top3").innerText="3. trollson — 11"
+
+}
 
 spawnEnemy()
 loadLeaderboard()
