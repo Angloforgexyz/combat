@@ -169,6 +169,39 @@ Enemies defeated: <span id="score-value">0</span>
 let playerHP=5;
 let enemiesDefeated=0;
 
+const leaderboardURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTW7YErPi0xFWjGmWqftl7cXBPe1AoYhr9t3t_1sBf7tdSXK4eury7Ax6Fij_K058Y3HAcAS0sYPTk8/pub?output=csv";
+
+function loadLeaderboard(){
+
+fetch(leaderboardURL)
+.then(res=>res.text())
+.then(data=>{
+
+let rows=data.split("\n").slice(1);
+
+let scores=rows.map(r=>{
+let c=r.split(",");
+return{
+name:c[1],
+score:parseInt(c[2])
+};
+}).filter(x=>x.name && !isNaN(x.score));
+
+scores.sort((a,b)=>b.score-a.score);
+
+if(scores[0])
+document.getElementById("top1").innerHTML="1. "+scores[0].name+" — "+scores[0].score;
+
+if(scores[1])
+document.getElementById("top2").innerHTML="2. "+scores[1].name+" — "+scores[1].score;
+
+if(scores[2])
+document.getElementById("top3").innerHTML="3. "+scores[2].name+" — "+scores[2].score;
+
+});
+
+}
+
 const lexicon=[
 {word:"cat",ipa:["k","æ","t"]},
 {word:"ship",ipa:["ʃ","ɪ","p"]},
@@ -375,6 +408,7 @@ setTimeout(enemyAttack,500);
 
 shuffleEnemies();
 loadEnemy();
+loadLeaderboard();
 
 </script>
 
