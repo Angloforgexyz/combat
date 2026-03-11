@@ -134,8 +134,7 @@ Learn the battle moves
 </a>
 </p>
 
-<button class="modebutton" onclick="startEndless()">Endless Arena</button> 
-<button class="modebutton" onclick="startNightmare()">Active Nightmare</button>
+<button class="modebutton" onclick="startEndless()">Endless Arena</button>
 
 <p>Enemies defeated: <span id="score">0</span></p>
 
@@ -159,7 +158,8 @@ Learn the battle moves
 let playerHP=5
 let enemyHP=3
 let score=0
-let nightmareMode=false
+
+let lastEnemy=null
 
 const lexicon=[
 {word:"cat",ipa:["k","æ","t"]},
@@ -179,22 +179,22 @@ const lexicon=[
 
 let currentEnemy
 
-function dailyIndex(){
-const d=new Date()
-return (d.getFullYear()+d.getMonth()+d.getDate())%lexicon.length
-}
-
 function randomEnemy(){
-return lexicon[Math.floor(Math.random()*lexicon.length)]
+
+let enemy
+
+do{
+enemy=lexicon[Math.floor(Math.random()*lexicon.length)]
+}while(enemy===lastEnemy)
+
+lastEnemy=enemy
+return enemy
+
 }
 
 function spawnEnemy(){
 
-if(nightmareMode){
-currentEnemy=lexicon[dailyIndex()]
-}else{
 currentEnemy=randomEnemy()
-}
 
 document.getElementById("enemyWord").innerText=currentEnemy.word.toUpperCase()
 
@@ -320,14 +320,6 @@ document.getElementById("playerHP").style.width=(playerHP/5*100)+"%"
 
 function startEndless(){
 
-nightmareMode=false
-spawnEnemy()
-
-}
-
-function startNightmare(){
-
-nightmareMode=true
 spawnEnemy()
 
 }
@@ -348,6 +340,8 @@ method:"POST",
 mode:"no-cors",
 body:data
 })
+
+setTimeout(loadLeaderboard,3000)
 
 }
 
