@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
 <meta charset="UTF-8">
@@ -46,10 +47,6 @@ border:1px solid #555;
 height:100%;
 background:#e74c3c;
 width:100%;
-}
-
-#player-area{
-margin-top:20px;
 }
 
 #player-sprite{
@@ -103,12 +100,6 @@ border:none;
 color:white;
 }
 
-#battle-log{
-margin-top:15px;
-min-height:30px;
-color:#ccc;
-}
-
 .forge-manual{
 display:inline-block;
 margin-top:12px;
@@ -116,12 +107,11 @@ padding:12px 26px;
 background:#162233;
 border:2px solid #4fc3ff;
 color:#7fd8ff;
-font-size:18px;
 text-decoration:none;
-border-radius:6px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -138,36 +128,24 @@ Arrange the phonemes in the correct order and strike.
 <a class="forge-manual"
 href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html"
 target="_blank">
-Learn the battle moves
-</a>
+Learn the battle moves </a>
 
 <div id="enemy-area">
 <div id="enemy-sprite">👹</div>
 <div id="enemy-name"></div>
-
-<div class="hpbar">
-<div id="enemy-health" class="hpfill"></div>
-</div>
+<div class="hpbar"><div id="enemy-health" class="hpfill"></div></div>
 </div>
 
 <div id="player-area">
-
 <div id="player-sprite">🛡</div>
 <div id="player-name">You</div>
-
-<div class="hpbar">
-<div id="player-health" class="hpfill"></div>
-</div>
-
+<div class="hpbar"><div id="player-health" class="hpfill"></div></div>
 </div>
 
 <div id="mora-slots"></div>
-
 <div id="cards"></div>
 
 <button onclick="validate()">ATTACK</button>
-
-<div id="battle-log"></div>
 
 </div>
 
@@ -175,52 +153,54 @@ Learn the battle moves
 
 /* PLAYER */
 
-var playerHP=5;
+let playerHP = 5;
 
-/* ENEMY WORD LIST (large pool) */
+/* LARGE WORD BANK */
 
-var enemies=[
+const wordBank = [
 
-{name:"cat",sprite:"👺",phonemes:["k","æ","t"],mora:3,hp:1},
-{name:"dog",sprite:"👺",phonemes:["d","ɒ","g"],mora:3,hp:1},
-{name:"sun",sprite:"🦂",phonemes:["s","ʌ","n"],mora:3,hp:1},
-{name:"moon",sprite:"🐗",phonemes:["m","uː","n"],mora:3,hp:1},
-{name:"map",sprite:"👹",phonemes:["m","æ","p"],mora:3,hp:1},
-{name:"cap",sprite:"👹",phonemes:["k","æ","p"],mora:3,hp:1},
-{name:"tap",sprite:"👹",phonemes:["t","æ","p"],mora:3,hp:1},
-{name:"bed",sprite:"👹",phonemes:["b","ɛ","d"],mora:3,hp:1},
-{name:"pen",sprite:"👹",phonemes:["p","ɛ","n"],mora:3,hp:1},
-{name:"red",sprite:"👹",phonemes:["r","ɛ","d"],mora:3,hp:1},
+"cat","dog","sun","moon","map","cap","tap","bed","pen","red",
+"ship","sheep","chip","jeep","think","this","light","night",
+"fight","sight","stone","storm","plant","dream","flame","brave",
+"frame","glass","grain","train","brain","plain","climb","crime",
+"drift","shift","swift","craft","draft","shaft","trust","burst",
+"curse","verse","nurse","first","world","sword","board","shore",
+"score","floor","roar","door","tower","power","flower","river",
+"silver","winter","hunter","singer","finger","danger","anger",
+"dragon","shadow","hollow","yellow","follow","borrow","narrow",
+"mirror","terror","horror","error","wonder","thunder","number",
+"ember","member","remember","tremor","armor","harbor","harvest",
+"forest","desert","ocean","island","valley","canyon","mountain",
 
-{name:"ship",sprite:"👹",phonemes:["ʃ","ɪ","p"],mora:3,hp:2},
-{name:"sheep",sprite:"👹",phonemes:["ʃ","iː","p"],mora:3,hp:2},
-{name:"chip",sprite:"👹",phonemes:["tʃ","ɪ","p"],mora:3,hp:2},
-{name:"jeep",sprite:"👹",phonemes:["dʒ","iː","p"],mora:3,hp:2},
-{name:"think",sprite:"👹",phonemes:["θ","ɪ","ŋ","k"],mora:4,hp:2},
-{name:"this",sprite:"👹",phonemes:["ð","ɪ","s"],mora:3,hp:2},
+/* Lovecraft flavor */
 
-{name:"light",sprite:"🌑",phonemes:["l","aɪ","t"],mora:3,hp:2},
-{name:"night",sprite:"🌑",phonemes:["n","aɪ","t"],mora:3,hp:2},
-{name:"fight",sprite:"🌑",phonemes:["f","aɪ","t"],mora:3,hp:2},
-{name:"sight",sprite:"🌑",phonemes:["s","aɪ","t"],mora:3,hp:2},
-
-{name:"crypt",sprite:"🪦",phonemes:["k","r","ɪ","p","t"],mora:5,hp:2},
-{name:"glyph",sprite:"📜",phonemes:["g","l","ɪ","f"],mora:4,hp:2},
-{name:"abyss",sprite:"🐙",phonemes:["ə","b","ɪ","s"],mora:4,hp:2},
-{name:"void",sprite:"🌑",phonemes:["v","ɔɪ","d"],mora:3,hp:1},
-{name:"cult",sprite:"🕯️",phonemes:["k","ʌ","l","t"],mora:4,hp:2},
-
-{name:"ritual",sprite:"🔮",phonemes:["r","ɪ","tʃ","u","ə","l"],mora:6,hp:3},
-{name:"eldritch",sprite:"🐍",phonemes:["ɛ","l","d","r","ɪ","tʃ"],mora:6,hp:3},
-{name:"horror",sprite:"👁️",phonemes:["h","ɔ","r","ə","r"],mora:5,hp:2},
-{name:"shoggoth",sprite:"🫧",phonemes:["ʃ","ɒ","g","ə","θ"],mora:5,hp:2}
+"abyss","crypt","glyph","cult","void","ritual","eldritch",
+"shoggoth","nameless","madness","cosmic","horror","ancient",
+"forgotten","whisper","shadowed","lurking","dread","voidborn",
+"deepone","starspawn"
 
 ];
 
-/* SHUFFLE BAG */
+/* convert words to enemies */
 
-var enemyBag=[];
-var enemyIndex=0;
+let enemies = wordBank.map(word => {
+
+let phonemes = word.split("");
+
+return {
+name: word,
+sprite:"👹",
+phonemes: phonemes,
+mora: phonemes.length,
+hp: Math.max(1,Math.floor(phonemes.length/3))
+};
+
+});
+
+/* shuffle bag */
+
+let enemyBag=[];
+let enemyIndex=0;
 
 function shuffleEnemies(){
 
@@ -235,12 +215,10 @@ enemyIndex=0;
 
 }
 
-/* GAME STATE */
+let currentEnemy;
+let enemyHP;
 
-var currentEnemy;
-var enemyHP;
-
-/* LOAD ENEMY */
+/* load enemy */
 
 function loadEnemy(){
 
@@ -253,47 +231,38 @@ enemyIndex++;
 
 enemyHP=currentEnemy.hp;
 
-document.getElementById("enemy-name").innerHTML=
-currentEnemy.name.charAt(0).toUpperCase()+currentEnemy.name.slice(1);
-
-document.getElementById("enemy-sprite").innerHTML=currentEnemy.sprite;
+document.getElementById("enemy-name").innerHTML=currentEnemy.name;
 
 updateHealth();
 renderSlots();
 renderCards();
 
-document.getElementById("battle-log").innerHTML=
-"A word crawls from the abyss...";
-
 }
 
-/* HEALTH */
+/* health */
 
 function updateHealth(){
 
-document.getElementById("enemy-health").style.width=
+document.getElementById("enemy-health").style.width =
 (enemyHP/currentEnemy.hp*100)+"%";
 
-document.getElementById("player-health").style.width=
+document.getElementById("player-health").style.width =
 (playerHP/5*100)+"%";
 
 }
 
-/* SLOTS */
+/* slots */
 
 function renderSlots(){
 
-var box=document.getElementById("mora-slots");
+let box=document.getElementById("mora-slots");
 box.innerHTML="";
 
-for(var i=0;i<currentEnemy.mora;i++){
+for(let i=0;i<currentEnemy.mora;i++){
 
-var d=document.createElement("div");
+let d=document.createElement("div");
 d.className="slot";
-
-d.onclick=function(){
-this.innerHTML="";
-};
+d.onclick=function(){this.innerHTML="";};
 
 box.appendChild(d);
 
@@ -301,83 +270,68 @@ box.appendChild(d);
 
 }
 
-/* CARDS */
+/* cards */
 
 function placeCard(p){
 
-var slots=document.getElementsByClassName("slot");
+let slots=document.getElementsByClassName("slot");
 
-for(var i=0;i<slots.length;i++){
-
+for(let i=0;i<slots.length;i++){
 if(slots[i].innerHTML===""){
 slots[i].innerHTML=p;
 return;
 }
-
 }
 
 }
 
 function renderCards(){
 
-var box=document.getElementById("cards");
+let box=document.getElementById("cards");
 box.innerHTML="";
 
-var shuffled=[...currentEnemy.phonemes].sort(()=>Math.random()-0.5);
+let shuffled=[...currentEnemy.phonemes].sort(()=>Math.random()-0.5);
 
-for(var i=0;i<shuffled.length;i++){
+shuffled.forEach(p=>{
 
-var p=shuffled[i];
-
-var c=document.createElement("div");
+let c=document.createElement("div");
 c.className="card";
 c.innerHTML=p;
 
-c.onclick=function(){
-placeCard(this.innerHTML);
-};
+c.onclick=function(){placeCard(p);};
 
 box.appendChild(c);
 
-}
+});
 
 }
 
-/* ENEMY ATTACK */
+/* enemy attack */
 
 function enemyAttack(){
 
 playerHP--;
 
-document.getElementById("battle-log").innerHTML=
-"The creature claws at your tongue!";
-
 updateHealth();
 
 if(playerHP<=0){
 
-document.getElementById("battle-log").innerHTML=
-"The Forge resets...";
-
-setTimeout(function(){
-
 playerHP=5;
+shuffleEnemies();
 loadEnemy();
 
-},1500);
-
 }
 
 }
 
-/* VALIDATE */
+/* validation */
 
 function validate(){
 
-var slots=document.getElementsByClassName("slot");
-var correct=true;
+let slots=document.getElementsByClassName("slot");
+let correct=true;
 
-for(var i=0;i<currentEnemy.phonemes.length;i++){
+for(let i=0;i<currentEnemy.phonemes.length;i++){
 
 if(slots[i].innerHTML!=currentEnemy.phonemes[i]){
 correct=false;
@@ -389,40 +343,24 @@ if(correct){
 
 enemyHP--;
 
-document.getElementById("battle-log").innerHTML=
-"The word collapses into phonemic dust.";
-
 updateHealth();
 
 if(enemyHP<=0){
-
-document.getElementById("battle-log").innerHTML=
-"The beast dissolves into the void.";
-
-setTimeout(loadEnemy,1000);
-
+setTimeout(loadEnemy,700);
 }else{
-
 renderSlots();
-
 }
 
 }else{
 
-document.getElementById("battle-log").innerHTML=
-"The spell fails.";
-
-for(var i=0;i<slots.length;i++){
-slots[i].innerHTML="";
-}
-
-setTimeout(enemyAttack,700);
+for(let s of slots){s.innerHTML="";}
+setTimeout(enemyAttack,500);
 
 }
 
 }
 
-/* START GAME */
+/* start */
 
 shuffleEnemies();
 loadEnemy();
@@ -431,4 +369,3 @@ loadEnemy();
 
 </body>
 </html>
-```
