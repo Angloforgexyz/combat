@@ -21,6 +21,18 @@ max-width:600px;
 margin:auto;
 }
 
+#leaderboard{
+margin-bottom:20px;
+padding:10px;
+background:#111a28;
+border:1px solid #4fc3ff;
+}
+
+#leaderboard h3{
+margin:5px 0;
+color:#ffd36b;
+}
+
 #enemy-area{
 margin-top:20px;
 }
@@ -53,11 +65,6 @@ width:100%;
 font-size:60px;
 }
 
-#player-name{
-font-size:20px;
-color:#66d9ff;
-}
-
 #mora-slots{
 margin-top:25px;
 }
@@ -88,10 +95,6 @@ cursor:pointer;
 background:#162233;
 }
 
-.card:hover{
-background:#22354d;
-}
-
 button{
 margin-top:15px;
 padding:12px 30px;
@@ -102,22 +105,6 @@ color:white;
 cursor:pointer;
 }
 
-.forge-manual{
-display:inline-block;
-margin-top:12px;
-padding:12px 26px;
-background:#162233;
-border:2px solid #4fc3ff;
-color:#7fd8ff;
-text-decoration:none;
-}
-
-#score{
-margin-top:10px;
-font-size:18px;
-color:#7fd8ff;
-}
-
 </style>
 
 </head>
@@ -126,17 +113,14 @@ color:#7fd8ff;
 
 <div id="battlefield">
 
+<div id="leaderboard">
+<h3>🏆 Forge Champions</h3>
+<div id="top1">1. ---</div>
+<div id="top2">2. ---</div>
+<div id="top3">3. ---</div>
+</div>
+
 <h2>ANGLOFORGE COMBAT</h2>
-
-<p>
-Defeat the sounds.<br>
-Arrange the phonemes in the correct order and strike.
-</p>
-
-<a class="forge-manual"
-href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/IPA_charts_EI.html"
-target="_blank">
-Learn the battle moves </a>
 
 <div id="score">
 Enemies defeated: <span id="score-value">0</span>
@@ -150,51 +134,40 @@ Enemies defeated: <span id="score-value">0</span>
 
 <div id="player-area">
 <div id="player-sprite">🛡</div>
-<div id="player-name">You</div>
 <div class="hpbar"><div id="player-health" class="hpfill"></div></div>
 </div>
 
 <div id="mora-slots"></div>
 <div id="cards"></div>
 
-<button onclick="validate()">ATTACK</button> <button onclick="submitScore()">Submit Score</button>
+<button onclick="validate()">ATTACK</button>
 
 </div>
 
 <script>
 
-let playerHP = 5;
-let enemiesDefeated = 0;
+let playerHP=5;
+let enemiesDefeated=0;
 
-const wordBank = [
-
-"cat","dog","sun","moon","map","cap","tap","bed","pen","red",
-"ship","sheep","chip","jeep","think","this","light","night",
-"fight","sight","stone","storm","plant","dream","flame","brave",
-"frame","glass","grain","train","brain","plain","climb","crime",
-"drift","shift","swift","craft","draft","shaft","trust","burst",
-"curse","verse","nurse","first","world","sword","board","shore",
-"score","floor","roar","door","tower","power","flower","river",
-"silver","winter","hunter","singer","finger","danger","anger",
-"dragon","shadow","hollow","yellow","follow","borrow","narrow",
-"mirror","terror","horror","error","wonder","thunder","number",
-"ember","member","remember","tremor","armor","harbor","harvest",
-"forest","desert","ocean","island","valley","canyon","mountain",
-"abyss","crypt","glyph","cult","void","ritual","eldritch",
-"shoggoth","nameless","madness","cosmic","ancient","forgotten",
-"whisper","shadowed","lurking","dread","voidborn","deepone","starspawn"
-
+const wordBank=[
+"cat","dog","ship","sheep","think","this","stone","storm","plant",
+"dream","flame","glass","train","brain","climb","crime","drift",
+"swift","craft","trust","world","sword","shore","tower","river",
+"singer","danger","dragon","shadow","mirror","horror","terror",
+"wonder","thunder","forest","desert","ocean","valley","abyss",
+"crypt","glyph","cult","void","ritual","eldritch","shoggoth",
+"nameless","madness","cosmic","ancient","forgotten","whisper"
 ];
 
-let enemies = wordBank.map(word => {
+let enemies=wordBank.map(word=>{
 
-let phonemes = word.split("");
+let phonemes=word.split("");
 
-return {
-name: word,
-phonemes: phonemes,
-mora: phonemes.length,
-hp: Math.max(1,Math.floor(phonemes.length/3))
+return{
+name:word,
+phonemes:phonemes,
+mora:phonemes.length,
+hp:Math.max(1,Math.floor(phonemes.length/3))
 };
 
 });
@@ -220,13 +193,9 @@ let enemyHP;
 
 function loadEnemy(){
 
-if(enemyIndex>=enemyBag.length){
-shuffleEnemies();
-}
+if(enemyIndex>=enemyBag.length) shuffleEnemies();
 
-currentEnemy=enemyBag[enemyIndex];
-enemyIndex++;
-
+currentEnemy=enemyBag[enemyIndex++];
 enemyHP=currentEnemy.hp;
 
 document.getElementById("enemy-name").innerHTML=currentEnemy.name;
@@ -239,10 +208,10 @@ renderCards();
 
 function updateHealth(){
 
-document.getElementById("enemy-health").style.width =
+document.getElementById("enemy-health").style.width=
 (enemyHP/currentEnemy.hp*100)+"%";
 
-document.getElementById("player-health").style.width =
+document.getElementById("player-health").style.width=
 (playerHP/5*100)+"%";
 
 }
@@ -257,9 +226,7 @@ for(let i=0;i<currentEnemy.mora;i++){
 let d=document.createElement("div");
 d.className="slot";
 
-d.onclick=function(){
-this.innerHTML="";
-};
+d.onclick=function(){this.innerHTML="";};
 
 box.appendChild(d);
 
@@ -293,12 +260,31 @@ let c=document.createElement("div");
 c.className="card";
 c.innerHTML=p;
 
-c.onclick=function(){
-placeCard(p);
-};
+c.onclick=function(){placeCard(p);};
 
 box.appendChild(c);
 
+});
+
+}
+
+function submitScore(score){
+
+let name=prompt("Forge Champion name:");
+
+if(!name) return;
+
+let formURL="https://docs.google.com/forms/d/e/1FAIpQLSftQRRykk_Uwrv0qw9w2VlaKy6aKWO9u4VJZib3izXuPjJoNQ/formResponse";
+
+let data=new FormData();
+
+data.append("entry.860941965",name);
+data.append("entry.923184678",score);
+
+fetch(formURL,{
+method:"POST",
+mode:"no-cors",
+body:data
 });
 
 }
@@ -311,11 +297,14 @@ updateHealth();
 
 if(playerHP<=0){
 
-alert("You were defeated! Score: "+enemiesDefeated);
+submitScore(enemiesDefeated);
+
+alert("Defeated. Score: "+enemiesDefeated);
 
 playerHP=5;
 enemiesDefeated=0;
-document.getElementById("score-value").innerHTML=enemiesDefeated;
+
+document.getElementById("score-value").innerHTML=0;
 
 shuffleEnemies();
 loadEnemy();
@@ -330,11 +319,7 @@ let slots=document.getElementsByClassName("slot");
 let correct=true;
 
 for(let i=0;i<currentEnemy.phonemes.length;i++){
-
-if(slots[i].innerHTML!=currentEnemy.phonemes[i]){
-correct=false;
-}
-
+if(slots[i].innerHTML!=currentEnemy.phonemes[i]) correct=false;
 }
 
 if(correct){
@@ -356,33 +341,10 @@ renderSlots();
 
 }else{
 
-for(let s of slots){s.innerHTML="";}
+for(let s of slots) s.innerHTML="";
 setTimeout(enemyAttack,500);
 
 }
-
-}
-
-function submitScore(){
-
-let playerName = prompt("Enter your name for the Forge leaderboard:");
-
-if(!playerName) return;
-
-let formURL = "https://docs.google.com/forms/d/e/1FAIpQLSftQRRykk_Uwrv0qw9w2VlaKy6aKWO9u4VJZib3izXuPjJoNQ/formResponse";
-
-let formData = new FormData();
-
-formData.append("entry.860941965", playerName);
-formData.append("entry.923184678", enemiesDefeated);
-
-fetch(formURL,{
-method:"POST",
-mode:"no-cors",
-body:formData
-});
-
-alert("Score submitted to the Forge!");
 
 }
 
