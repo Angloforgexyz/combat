@@ -11,7 +11,7 @@
 body{
 background:#0a0f18;
 color:white;
-font-family:Arial, sans-serif;
+font-family:Arial,sans-serif;
 text-align:center;
 padding:10px;
 }
@@ -178,34 +178,47 @@ Learn the battle moves
 
 var playerHP=5;
 
-/* ENEMY WORDS */
+/* ENEMY WORD LIST (large pool) */
 
 var enemies=[
-
-{name:"abyss",sprite:"🐙",phonemes:["ə","b","ɪ","s"],mora:4,hp:2},
-{name:"cult",sprite:"🕯️",phonemes:["k","ʌ","l","t"],mora:4,hp:2},
-{name:"void",sprite:"🌑",phonemes:["v","ɔɪ","d"],mora:3,hp:1},
-{name:"crypt",sprite:"🪦",phonemes:["k","r","ɪ","p","t"],mora:5,hp:2},
-{name:"glyph",sprite:"📜",phonemes:["g","l","ɪ","f"],mora:4,hp:2},
-{name:"horror",sprite:"👁️",phonemes:["h","ɔ","r","ə","r"],mora:5,hp:2},
-{name:"eldritch",sprite:"🐍",phonemes:["ɛ","l","d","r","ɪ","tʃ"],mora:6,hp:3},
-{name:"shoggoth",sprite:"🫧",phonemes:["ʃ","ɒ","g","ə","θ"],mora:5,hp:2},
-{name:"ritual",sprite:"🔮",phonemes:["r","ɪ","tʃ","u","ə","l"],mora:6,hp:3},
 
 {name:"cat",sprite:"👺",phonemes:["k","æ","t"],mora:3,hp:1},
 {name:"dog",sprite:"👺",phonemes:["d","ɒ","g"],mora:3,hp:1},
 {name:"sun",sprite:"🦂",phonemes:["s","ʌ","n"],mora:3,hp:1},
 {name:"moon",sprite:"🐗",phonemes:["m","uː","n"],mora:3,hp:1},
-{name:"light",sprite:"🌀",phonemes:["l","aɪ","t"],mora:3,hp:1},
-{name:"red",sprite:"🌀",phonemes:["r","ɛ","d"],mora:3,hp:1},
+{name:"map",sprite:"👹",phonemes:["m","æ","p"],mora:3,hp:1},
+{name:"cap",sprite:"👹",phonemes:["k","æ","p"],mora:3,hp:1},
+{name:"tap",sprite:"👹",phonemes:["t","æ","p"],mora:3,hp:1},
+{name:"bed",sprite:"👹",phonemes:["b","ɛ","d"],mora:3,hp:1},
+{name:"pen",sprite:"👹",phonemes:["p","ɛ","n"],mora:3,hp:1},
+{name:"red",sprite:"👹",phonemes:["r","ɛ","d"],mora:3,hp:1},
+
+{name:"ship",sprite:"👹",phonemes:["ʃ","ɪ","p"],mora:3,hp:2},
+{name:"sheep",sprite:"👹",phonemes:["ʃ","iː","p"],mora:3,hp:2},
+{name:"chip",sprite:"👹",phonemes:["tʃ","ɪ","p"],mora:3,hp:2},
+{name:"jeep",sprite:"👹",phonemes:["dʒ","iː","p"],mora:3,hp:2},
 {name:"think",sprite:"👹",phonemes:["θ","ɪ","ŋ","k"],mora:4,hp:2},
 {name:"this",sprite:"👹",phonemes:["ð","ɪ","s"],mora:3,hp:2},
-{name:"chair",sprite:"⚔️",phonemes:["tʃ","ɛ","r"],mora:3,hp:2},
-{name:"jump",sprite:"⚔️",phonemes:["dʒ","ʌ","m","p"],mora:4,hp:2}
+
+{name:"light",sprite:"🌑",phonemes:["l","aɪ","t"],mora:3,hp:2},
+{name:"night",sprite:"🌑",phonemes:["n","aɪ","t"],mora:3,hp:2},
+{name:"fight",sprite:"🌑",phonemes:["f","aɪ","t"],mora:3,hp:2},
+{name:"sight",sprite:"🌑",phonemes:["s","aɪ","t"],mora:3,hp:2},
+
+{name:"crypt",sprite:"🪦",phonemes:["k","r","ɪ","p","t"],mora:5,hp:2},
+{name:"glyph",sprite:"📜",phonemes:["g","l","ɪ","f"],mora:4,hp:2},
+{name:"abyss",sprite:"🐙",phonemes:["ə","b","ɪ","s"],mora:4,hp:2},
+{name:"void",sprite:"🌑",phonemes:["v","ɔɪ","d"],mora:3,hp:1},
+{name:"cult",sprite:"🕯️",phonemes:["k","ʌ","l","t"],mora:4,hp:2},
+
+{name:"ritual",sprite:"🔮",phonemes:["r","ɪ","tʃ","u","ə","l"],mora:6,hp:3},
+{name:"eldritch",sprite:"🐍",phonemes:["ɛ","l","d","r","ɪ","tʃ"],mora:6,hp:3},
+{name:"horror",sprite:"👁️",phonemes:["h","ɔ","r","ə","r"],mora:5,hp:2},
+{name:"shoggoth",sprite:"🫧",phonemes:["ʃ","ɒ","g","ə","θ"],mora:5,hp:2}
 
 ];
 
-/* ENEMY BAG SYSTEM */
+/* SHUFFLE BAG */
 
 var enemyBag=[];
 var enemyIndex=0;
@@ -410,7 +423,7 @@ setTimeout(enemyAttack,700);
 
 }
 
-/* INITIALIZE GAME */
+/* START GAME */
 
 shuffleEnemies();
 loadEnemy();
