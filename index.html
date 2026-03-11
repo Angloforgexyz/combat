@@ -71,6 +71,7 @@ line-height:55px;
 font-size:22px;
 margin:5px;
 background:#111a28;
+cursor:pointer;
 }
 
 #cards{
@@ -92,12 +93,13 @@ background:#22354d;
 }
 
 button{
-margin-top:20px;
+margin-top:15px;
 padding:12px 30px;
 font-size:18px;
 background:#e74c3c;
 border:none;
 color:white;
+cursor:pointer;
 }
 
 .forge-manual{
@@ -108,6 +110,12 @@ background:#162233;
 border:2px solid #4fc3ff;
 color:#7fd8ff;
 text-decoration:none;
+}
+
+#score{
+margin-top:10px;
+font-size:18px;
+color:#7fd8ff;
 }
 
 </style>
@@ -130,6 +138,10 @@ href="https://www.internationalphoneticassociation.org/IPAcharts/IPA_charts_EI/I
 target="_blank">
 Learn the battle moves </a>
 
+<div id="score">
+Enemies defeated: <span id="score-value">0</span>
+</div>
+
 <div id="enemy-area">
 <div id="enemy-sprite">👹</div>
 <div id="enemy-name"></div>
@@ -145,7 +157,7 @@ Learn the battle moves </a>
 <div id="mora-slots"></div>
 <div id="cards"></div>
 
-<button onclick="validate()">ATTACK</button>
+<button onclick="validate()">ATTACK</button> <button onclick="submitScore()">Submit Score</button>
 
 </div>
 
@@ -154,8 +166,9 @@ Learn the battle moves </a>
 /* PLAYER */
 
 let playerHP = 5;
+let enemiesDefeated = 0;
 
-/* LARGE WORD BANK */
+/* WORD BANK */
 
 const wordBank = [
 
@@ -171,17 +184,13 @@ const wordBank = [
 "mirror","terror","horror","error","wonder","thunder","number",
 "ember","member","remember","tremor","armor","harbor","harvest",
 "forest","desert","ocean","island","valley","canyon","mountain",
-
-/* Lovecraft flavor */
-
 "abyss","crypt","glyph","cult","void","ritual","eldritch",
-"shoggoth","nameless","madness","cosmic","horror","ancient",
-"forgotten","whisper","shadowed","lurking","dread","voidborn",
-"deepone","starspawn"
+"shoggoth","nameless","madness","cosmic","ancient","forgotten",
+"whisper","shadowed","lurking","dread","voidborn","deepone","starspawn"
 
 ];
 
-/* convert words to enemies */
+/* ENEMY CREATION */
 
 let enemies = wordBank.map(word => {
 
@@ -189,7 +198,6 @@ let phonemes = word.split("");
 
 return {
 name: word,
-sprite:"👹",
 phonemes: phonemes,
 mora: phonemes.length,
 hp: Math.max(1,Math.floor(phonemes.length/3))
@@ -197,7 +205,7 @@ hp: Math.max(1,Math.floor(phonemes.length/3))
 
 });
 
-/* shuffle bag */
+/* SHUFFLE BAG */
 
 let enemyBag=[];
 let enemyIndex=0;
@@ -218,7 +226,7 @@ enemyIndex=0;
 let currentEnemy;
 let enemyHP;
 
-/* load enemy */
+/* LOAD ENEMY */
 
 function loadEnemy(){
 
@@ -239,7 +247,7 @@ renderCards();
 
 }
 
-/* health */
+/* HEALTH */
 
 function updateHealth(){
 
@@ -251,7 +259,7 @@ document.getElementById("player-health").style.width =
 
 }
 
-/* slots */
+/* SLOTS */
 
 function renderSlots(){
 
@@ -262,7 +270,10 @@ for(let i=0;i<currentEnemy.mora;i++){
 
 let d=document.createElement("div");
 d.className="slot";
-d.onclick=function(){this.innerHTML="";};
+
+d.onclick=function(){
+this.innerHTML="";
+};
 
 box.appendChild(d);
 
@@ -270,7 +281,7 @@ box.appendChild(d);
 
 }
 
-/* cards */
+/* CARDS */
 
 function placeCard(p){
 
@@ -298,7 +309,9 @@ let c=document.createElement("div");
 c.className="card";
 c.innerHTML=p;
 
-c.onclick=function(){placeCard(p);};
+c.onclick=function(){
+placeCard(p);
+};
 
 box.appendChild(c);
 
@@ -306,7 +319,7 @@ box.appendChild(c);
 
 }
 
-/* enemy attack */
+/* ENEMY ATTACK */
 
 function enemyAttack(){
 
@@ -316,7 +329,12 @@ updateHealth();
 
 if(playerHP<=0){
 
+alert("You were defeated! Score: "+enemiesDefeated);
+
 playerHP=5;
+enemiesDefeated=0;
+document.getElementById("score-value").innerHTML=enemiesDefeated;
+
 shuffleEnemies();
 loadEnemy();
 
@@ -324,7 +342,7 @@ loadEnemy();
 
 }
 
-/* validation */
+/* VALIDATION */
 
 function validate(){
 
@@ -346,7 +364,12 @@ enemyHP--;
 updateHealth();
 
 if(enemyHP<=0){
+
+enemiesDefeated++;
+document.getElementById("score-value").innerHTML=enemiesDefeated;
+
 setTimeout(loadEnemy,700);
+
 }else{
 renderSlots();
 }
@@ -360,7 +383,34 @@ setTimeout(enemyAttack,500);
 
 }
 
-/* start */
+/* SCORE SUBMISSION */
+
+function submitScore(){
+
+let playerName = prompt("Enter your name for the Forge leaderboard:");
+
+if(!playerName) return;
+
+let formURL = "https://docs.google.com/forms/d/e/1FAIpQLSftQRRykk_Uwrv0qw9w2VlaKy6aKWO9u4VJZib3izXuPjJoNQ/formResponse";
+
+let formData = new FormData();
+
+/* THESE TWO LINES NEED REAL ENTRY IDs */
+
+formData.append("entry.0000000000", playerName);
+formData.append("entry.1111111111", enemiesDefeated);
+
+fetch(formURL,{
+method:"POST",
+mode:"no-cors",
+body:formData
+});
+
+alert("Score submitted!");
+
+}
+
+/* START */
 
 shuffleEnemies();
 loadEnemy();
