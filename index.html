@@ -74,6 +74,15 @@ background:#111a28;
 cursor:pointer;
 }
 
+/* BOSS SWARM MODE */
+.bossSlot{
+width:34px;
+height:34px;
+line-height:34px;
+font-size:16px;
+margin:2px;
+}
+
 #cards{
 margin-top:20px;
 }
@@ -205,7 +214,6 @@ const lexicon=[
 {word:"rain",ipa:["r","eɪ","n"]},
 {word:"snow",ipa:["s","n","oʊ"]},
 {word:"ice",ipa:["aɪ","s"]},
-{word:"stone",ipa:["s","t","oʊ","n"]},
 {word:"metal",ipa:["m","ɛ","t","əl"]},
 {word:"blade",ipa:["b","l","eɪ","d"]},
 {word:"shield",ipa:["ʃ","iː","l","d"]},
@@ -241,7 +249,6 @@ const lexicon=[
 {word:"heart",ipa:["h","ɑ","r","t"]},
 {word:"mind",ipa:["m","aɪ","n","d"]},
 {word:"thought",ipa:["θ","ɔ","t"]},
-{word:"dream",ipa:["d","r","iː","m"]},
 {word:"sleep",ipa:["s","l","iː","p"]},
 {word:"wake",ipa:["w","eɪ","k"]},
 {word:"walk",ipa:["w","ɔ","k"]},
@@ -265,7 +272,6 @@ const lexicon=[
 {word:"phrase",ipa:["f","r","eɪ","z"]},
 {word:"speech",ipa:["s","p","iː","tʃ"]},
 {word:"echo",ipa:["ɛ","k","oʊ"]},
-{word:"signal",ipa:["s","ɪ","g","n","əl"]},
 {word:"cipher",ipa:["s","aɪ","f","ər"]},
 {word:"symbol",ipa:["s","ɪ","m","b","əl"]},
 {word:"rune",ipa:["r","uː","n"]},
@@ -289,11 +295,21 @@ let phrase=bosses[bossIndex%bosses.length]
 
 bossIndex++
 
-let letters=phrase.toLowerCase().replace(/[^a-z]/g,"").split("")
+/* BOSS PHRASE → IPA */
+let words=phrase.toLowerCase().replace(/[^a-z\s]/g,"").split(" ")
+
+let ipaSequence=[]
+
+words.forEach(w=>{
+let found=lexicon.find(e=>e.word===w)
+if(found){
+ipaSequence=ipaSequence.concat(found.ipa)
+}
+})
 
 currentEnemy={
 word:phrase,
-ipa:letters
+ipa:ipaSequence
 }
 
 enemyHP=5
@@ -332,6 +348,11 @@ currentEnemy.ipa.forEach(()=>{
 
 let s=document.createElement("div")
 s.className="slot"
+
+if(isBoss){
+s.classList.add("bossSlot")
+}
+
 s.onclick=function(){s.innerHTML=""}
 
 box.appendChild(s)
